@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5384322087421651064
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 372271312765403763}
+  - component: {fileID: 188943282142752495}
+  m_Layer: 0
+  m_Name: LevelSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &372271312765403763
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5384322087421651064}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &188943282142752495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5384322087421651064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 397d3e271f3e38b4bbf8294c35c91608, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCount: 10
+  spawnObject:
+  - {fileID: 8745388150768394203, guid: a88025c7dd3f3a443a4f7bf21f3a261f, type: 3}
+  - {fileID: 3719332007625180627, guid: 27ab573a29b2ad64e96db4b21c295c8a, type: 3}
+  - {fileID: 3844247293183289520, guid: 2a918ff1f51e9694ab8944054e7cfe6f, type: 3}
+  - {fileID: 1984521859357278117, guid: a54cded2c5f394d4cadbf1454df7a01f, type: 3}
+  minimumPlaneAxis: {x: -40, y: -90}
+  maximumPlaneAxis: {x: 40, y: -10}
+  minimumDistance: 15
+  level: 23
+  enemies:
+  - {fileID: 8331215176910770083, guid: 31a8d5befc7780c40bb8b4a4f9836ba9, type: 3}
+  - {fileID: 7194514121115276090, guid: 59966187995cf504680d1fe42a882b27, type: 3}
+  - {fileID: 8865285449141921391, guid: 0074312eb06bad6439711b480137397d, type: 3}
+  player: {fileID: 0}
+  roundBillboard: {fileID: 0}
