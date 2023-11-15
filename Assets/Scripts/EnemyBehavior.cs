@@ -47,6 +47,7 @@ public class EnemyBehavior : MonoBehaviour
     private bool isAttacking;
 
     private float currentHealth;
+    private float previousHealth;
 
     private Vector3 direction
     {
@@ -94,13 +95,7 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    private float distance
-    {
-        get
-        {
-            return Vector2.Distance(transform.position, target.position);
-        }
-    }
+    private float distance { get { return Vector2.Distance(transform.position, target.position); } }
 
     #endregion
 
@@ -118,20 +113,20 @@ public class EnemyBehavior : MonoBehaviour
     {
         health.SetMaxHealth(maxHealth);
         currentHealth = maxHealth;
+        previousHealth = currentHealth;
         health.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        Death();
         if (target == null || spawner == null) return;
+        Death();
         Attack();
     }
 
     private void LateUpdate()
     {
         DistanceChecker();
-        Aim();
     }
 
     #region Private Methods
@@ -145,10 +140,11 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Aim()
     {
-        if (distance > detectionRange) return;
         Vector2 relativePosition = target.position - rotator.position;
-        Quaternion targetOrientation = Quaternion.LookRotation(rotator.forward, relativePosition);
-        rotator.rotation = Quaternion.Slerp(rotator.rotation, targetOrientation, rotationSpeed * Time.deltaTime);
+        rotator.rotation = Quaternion.FromToRotation(Vector2.up, relativePosition);
+
+        animator.SetFloat("X", relativePosition.normalized.x);
+        animator.SetFloat("Y", relativePosition.normalized.y);
     }
 
     public void TakeDamage(float damage)
@@ -167,7 +163,7 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Attack()
     {
-        if (!readyToAttack || !playerIsDetected) return;
+        if (!readyToAttack) return;
         canMove = false;
         canAttack = false;
         StartCoroutine(attackPattern());
@@ -182,6 +178,8 @@ public class EnemyBehavior : MonoBehaviour
         GameObject tempBullet = spawner.GetClone();
 
         if (tempBullet == null || gameObject == null) yield return null;
+
+        Aim();
 
         tempBullet.transform.parent = parent.transform;
         tempBullet.transform.SetPositionAndRotation(caster.position, caster.rotation);
@@ -199,7 +197,9 @@ public class EnemyBehavior : MonoBehaviour
     {
         health.gameObject.SetActive(true);
         yield return new WaitForSeconds(showHealthDelay);
-        health.gameObject.SetActive(false);
+        if (currentHealth == previousHealth) health.gameObject.SetActive(false);
+        previousHealth = currentHealth;
+        yield return null;
     }
 
     #endregion

@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
     [Range (0.1f, 90)] [SerializeField] private float litDown;
     [Range (10f, 900)] [SerializeField] private float litUp;
     private int currentScene { get { return SceneManager.GetActiveScene().buildIndex; } }
+    public static PolygonCollider2D swordRange;
 
     #endregion
 
@@ -48,8 +49,8 @@ public class Player : MonoBehaviour
     private Vector3 velocity;
     private Vector3 currenVelocity;
 
+    public static bool canMove;
     private bool canSpawn;
-    private bool canMove;
     private bool canDash;
 
     private bool isAttacking;
@@ -62,7 +63,6 @@ public class Player : MonoBehaviour
         get
         {
             // prevent animator from rotating when attacking
-            animator.SetBool("IsAttacking", isAttacking);
             if (isAttacking) return Vector2.zero;
 
             float x = Input.GetAxisRaw("Horizontal");
@@ -75,11 +75,21 @@ public class Player : MonoBehaviour
         }
     }
 
+    private Vector3 mousePosition
+    {
+        get
+        {
+            Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mouse.z = 0;
+            return mouse;
+        }
+    }
+
     private bool attack
     {
         get
         {
-            return canSpawn && Input.GetKeyDown(KeyCode.Space) ? true : false;
+            return canSpawn && Input.GetMouseButtonDown(0) ? true : false;
         }
     }
 
@@ -99,6 +109,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         // initialize variables on awake
+        swordRange = GetComponentInChildren<PolygonCollider2D>();
         controller = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         canSpawn = true;
@@ -109,6 +120,8 @@ public class Player : MonoBehaviour
         health.SetMaxHealth(maxHealth);
         currentHealth = maxHealth;
 
+        swordRange.gameObject.SetActive(false);
+
         PlayerPrefs.SetInt("PreviousScene", currentScene);
     }
 
@@ -118,6 +131,7 @@ public class Player : MonoBehaviour
         AccessGranter();
         Death();
         Attack();
+        Slice();
     }
 
     private void FixedUpdate()
@@ -139,24 +153,22 @@ public class Player : MonoBehaviour
 
     private void Attack()
     {
-        Aim();
-
         if (isAttacking || isDashing || !attack) return;
         StartCoroutine(SpawnAura());
     }
 
     private void Aim()
     {
-        if (!Input.anyKey) return;
+        Vector3 target = mousePosition - transform.position;
+        animator.SetFloat("AtkY", target.normalized.y);
+        animator.SetFloat("AtkX", target.normalized.x);
+        rotator.rotation = Quaternion.FromToRotation(Vector2.right, target);
+    }
 
-        // place the caster to where the player is facing
-        rotator.localEulerAngles = direction.y > 0 ? new Vector3(0, 0, 90) :
-            direction.x > 0 ? new Vector3(0, 0, 0) :
-            direction.x < 0 ? new Vector3(0, 0, 180) :
-            new Vector3(0, 0, -90);
-
-
-        // --- can adjust to look for mouse position instead --- //
+    private void Slice()
+    {
+        if (!Input.GetKeyDown(KeyCode.Space) || isAttacking) return;
+        animator.SetTrigger("Slice");
     }
 
     public void TakeDamage(float damage)
@@ -213,6 +225,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator SpawnAura()
     {
+        Aim();
         isAttacking = true;
 
         // stop player from moving and casting another spell
@@ -228,6 +241,7 @@ public class Player : MonoBehaviour
         // set the position and orientation of the spell
         tempBullet.transform.SetPositionAndRotation(auraCaster.position, auraCaster.rotation);
         tempBullet.SetActive(true);
+        animator.SetTrigger("Aura");
 
         // despawn aura
         yield return new WaitForSeconds(attackDuration);

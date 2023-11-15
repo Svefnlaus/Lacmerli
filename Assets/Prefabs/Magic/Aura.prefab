@@ -80,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fc47ee77bf0d664083ca0e9a231d80a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 5
+  damage: 2.5
 --- !u!1 &1046401166862426701
 GameObject:
   m_ObjectHideFlags: 0
@@ -166,7 +166,7 @@ MonoBehaviour:
   points:
   - {fileID: 4006240608446122163}
   - {fileID: 166075595335448719}
-  maxSpeed: 60
+  maxSpeed: 30
   smoothTime: 0.01
   shootDelay: 0.5
   hitboxDelay: 0.1
@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fc47ee77bf0d664083ca0e9a231d80a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 2.5
+  damage: 0.5
 --- !u!1 &2608053928414373898
 GameObject:
   m_ObjectHideFlags: 0
@@ -5374,7 +5374,7 @@ MonoBehaviour:
   points:
   - {fileID: 254661091076617641}
   - {fileID: 3391818961967011496}
-  maxSpeed: 60
+  maxSpeed: 30
   smoothTime: 0.01
   shootDelay: 0.5
   hitboxDelay: 0.1

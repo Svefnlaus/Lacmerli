@@ -26,6 +26,7 @@ public class Objectives : MonoBehaviour
 
     private void Awake()
     {
+        if (system == null) return;
         coinsFound = 0;
         enemiesSlain = 0;
         enemyCount = totalEnemies;

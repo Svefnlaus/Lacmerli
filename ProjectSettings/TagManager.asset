@@ -8,6 +8,9 @@ TagManager:
   - Magic
   - Coins
   - Enemy
+  - Sword
+  - AbberatingThunder
+  - Throwables
   layers:
   - Default
   - TransparentFX

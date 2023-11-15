@@ -163,15 +163,4 @@ public class LevelSpawner : SpawnManager
         usedPositions[current] = currentPosition;
         return currentPosition;
     }
-
-    /*private float ScaleWithLevel(float coordinate)
-    {
-        // --- fix later --- //
-
-        int minX = (int)Mathf.Round(min.x - ScaleWithLevel(min.x));
-        int minY = (int)Mathf.Round(min.y - ScaleWithLevel(min.y));
-        int maxX = (int)Mathf.Round(max.x + ScaleWithLevel(max.x)) + 1;
-        int maxY = (int)Mathf.Round(max.y) + 1;
-        return coordinate > 0 ? level : -level;
-    }*/
 }

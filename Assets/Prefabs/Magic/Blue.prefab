@@ -5130,7 +5130,7 @@ MonoBehaviour:
   points:
   - {fileID: 8699283232578818951}
   - {fileID: 7191270321583700735}
-  maxSpeed: 45
+  maxSpeed: 30
   smoothTime: 0.01
   shootDelay: 0.475
   hitboxDelay: 0.1
