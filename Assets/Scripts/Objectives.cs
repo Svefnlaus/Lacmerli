@@ -20,7 +20,7 @@ public class Objectives : MonoBehaviour
 
     private bool enemiesCleared { get { return enemiesSlain == totalEnemies; } }
     private bool coinsCollected { get { return coinsFound == totalCoins; } }
-
+    private bool rewriteObjectiveBoard { get { return enemiesLeft == enemyCount && coinsLeft == coinCount ? false : true; } }
     private int coinsLeft { get { return totalCoins - coinsFound; } }
     private int enemiesLeft { get { return totalEnemies - enemiesSlain; } }
 
@@ -45,36 +45,48 @@ public class Objectives : MonoBehaviour
     private void ArcadeMode()
     {
         // prevent from looping
-        if (gameMode != "Arcade" || (enemiesLeft == enemyCount && coinsLeft == coinCount)) return;
-
-        Debug.Log("test");
-
-        objectivesBillboard.SetText(
-            "Objectives:\n\n" +
-            (enemiesLeft != 0 ? "Kill " + enemiesLeft  + " enemies\n" : "") +
-            (coinsLeft != 0 ? "Collect " + coinsLeft + " coins" : ""));
-
-        if (enemiesCleared && coinsCollected) system.LoadScene(0);
+        if (gameMode != "Arcade" || !rewriteObjectiveBoard) return;
 
         enemyCount = enemiesLeft;
         coinCount = coinsLeft;
+
+        UpdateObjectivesBoard();
+
+        if (!coinsCollected || !enemiesCleared) return;
+
+        system.LoadScene(0);
     }
 
     private void SurvivalMode()
     {
-        if (gameMode != "Survival") return;
+        if (gameMode != "Survival" || !rewriteObjectiveBoard) return;
 
-        objectivesBillboard.SetText(
-            "Objectives:\n\n" +
-            "Collect " + totalCoins + " coins");
+        enemyCount = enemiesLeft;
+        coinCount = coinsLeft;
+
+        UpdateObjectivesBoard();
 
         // prevent from looping
-        if (!coinsCollected) return;
+        if (!coinsCollected || !enemiesCleared) return;
         objectiveCleared = true;
 
         // ensure the set round is concatinated
         int round = PlayerPrefs.GetInt("Round") + 1;
         PlayerPrefs.SetInt("Round", round);
         system.LoadScene(round <= 10 ? 3 : 10 < round && round < 50 ? 4 : 5);
+    }
+
+    private void UpdateObjectivesBoard()
+    {
+        objectivesBillboard.SetText(
+            "Objectives:\n\n" +
+
+            (enemiesLeft != 0 ? "Kill " + enemiesLeft +
+            (enemiesLeft != totalEnemies ? " more " : "") +
+            " enem" + (enemiesLeft > 1 ? "ies" : "y") + "\n" : "") +
+
+            (coinsLeft != 0 ? "Collect " + coinsLeft +
+            (coinsLeft != totalCoins ? " more " : "") +
+            " coin" + (coinsLeft > 1 ? "s" : "") : ""));
     }
 }

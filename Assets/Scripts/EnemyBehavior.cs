@@ -46,6 +46,8 @@ public class EnemyBehavior : MonoBehaviour
     private bool canAttack;
     private bool isAttacking;
 
+    private bool isDead;
+
     private float currentHealth;
     private float previousHealth;
 
@@ -90,12 +92,15 @@ public class EnemyBehavior : MonoBehaviour
         get
         {
             bool moving = direction.magnitude > 0 ? true : false;
+            if (!moving) controller.velocity = Vector3.zero;
             animator.SetBool("IsMoving", moving);
             return moving;
         }
     }
 
     private float distance { get { return Vector2.Distance(transform.position, target.position); } }
+
+    private bool willError { get { return target == null || spawner == null || isDead ? true : false; } }
 
     #endregion
 
@@ -111,6 +116,7 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Start()
     {
+        // set health on start not on awake since enemies are spawned on awake
         health.SetMaxHealth(maxHealth);
         currentHealth = maxHealth;
         previousHealth = currentHealth;
@@ -119,14 +125,14 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Update()
     {
-        if (target == null || spawner == null) return;
+        if (willError) return;
         Death();
         Attack();
     }
 
     private void LateUpdate()
     {
-        if (target == null || spawner == null) return;
+        if (willError) return;
         DistanceChecker();
     }
 
@@ -158,6 +164,7 @@ public class EnemyBehavior : MonoBehaviour
     private void Death()
     {
         if (currentHealth > 0.1f) return;
+        isDead = true;
         Objectives.enemiesSlain++;
         parent.SetActive(false);
     }

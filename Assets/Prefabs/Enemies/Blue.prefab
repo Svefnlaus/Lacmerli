@@ -167,6 +167,73 @@ Transform:
   m_Father: {fileID: 6841291450400242792}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1445887967065541999
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6975894024573570738}
+  - component: {fileID: 6909541266704920266}
+  m_Layer: 7
+  m_Name: BodyCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6975894024573570738
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1445887967065541999}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6841291450400242792}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &6909541266704920266
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1445887967065541999}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: -0.75}
+  serializedVersion: 2
+  m_Radius: 0.25
 --- !u!1 &3355088621049790119
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,6 +556,7 @@ Transform:
   m_Children:
   - {fileID: 5670232684368567190}
   - {fileID: 1788395197462465824}
+  - {fileID: 6975894024573570738}
   m_Father: {fileID: 754678493111144572}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -573,9 +641,9 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7702773914944613814}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -621,7 +689,7 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -664,7 +732,7 @@ MonoBehaviour:
   - {x: 0.063855745, y: -1.0040643, z: 0}
   m_ShapePathHash: -494978704
   m_Mesh: {fileID: 0}
-  m_InstanceId: 59388
+  m_InstanceId: 78616
   m_LocalBounds:
     m_Center: {x: 0.0008455515, y: -0.8775635, z: 0}
     m_Extent: {x: 0.21137473, y: 0.12770721, z: 0}
@@ -688,13 +756,13 @@ MonoBehaviour:
   attackTime: 0.75
   attackDelay: 0.75
   attackCooldown: 1.5
-  damageReceived: 1.25
+  damageReceived: 2
   health: {fileID: 3643014728458705350}
   maxHealth: 85
-  showHealthDelay: 1.75
-  detectionRange: 20
+  showHealthDelay: 2
+  detectionRange: 25
   attackRange: 7.5
-  speed: 5
+  speed: 3.5
   smoothSpeed: 0.01
   rotationSpeed: 2.75
 --- !u!1 &8331215176910770083

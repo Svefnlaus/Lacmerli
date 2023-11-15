@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor.Recorder.Encoder;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,20 +9,28 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D controller;
     private Animator animator;
+    private SpawnManager spawner;
+
+    [Space]
 
     [SerializeField] private SceneLoader loader;
     [SerializeField] private bool enemiesAlwaysMoving;
 
+    [Space] [Header ("Slash Settings")]
+    public static PolygonCollider2D swordRange;
+    [Range (0.1f, 10)] [SerializeField] private float slashDuration;
+    [Range (0.1f, 10)] [SerializeField] private float slashCooldown;
+
     [Space] [Header ("Attack Settings")]
-    [SerializeField] private SpawnManager spawner;
     [SerializeField] private Transform rotator;
     [SerializeField] private Transform auraCaster;
-    [Range(0.1f, 10)][SerializeField] private float attackDuration;
-    [Range(0.1f, 10)][SerializeField] private float attackCooldown;
+    [Range (0.1f, 10)] [SerializeField] private float attackDuration;
+    [Range (0.1f, 10)] [SerializeField] private float attackCooldown;
 
     [Space] [Header("Health Settings")]
     [SerializeField] private HealthBar health;
-    [Range(1, 120)][SerializeField] private float maxHealth;
+    [Range (10, 1000)] [SerializeField] private float maxHealth;
+    [Range (0.1f, 10)] [SerializeField] private float deathDelay;
 
     [Space] [Header ("Movement Settings")]
     [Range (0.01f, 1)] [SerializeField] private float time;
@@ -38,23 +47,28 @@ public class Player : MonoBehaviour
     [Range (0.1f, 90)] [SerializeField] private float litDown;
     [Range (10f, 900)] [SerializeField] private float litUp;
     private int currentScene { get { return SceneManager.GetActiveScene().buildIndex; } }
-    public static PolygonCollider2D swordRange;
 
     #endregion
 
     #region Dynamic Variables
 
-    public static bool accessToMove;
-
     private Vector3 velocity;
     private Vector3 currenVelocity;
 
+    public static bool accessToMove;
+
+    private bool previousAccess;
+
     public static bool canMove;
-    private bool canSpawn;
+
+    private bool canSlash;
+    private bool canShoot;
     private bool canDash;
 
     private bool isAttacking;
+    private bool isSlashing;
     private bool isDashing;
+    private bool isDead;
 
     private float currentHealth;
 
@@ -85,90 +99,55 @@ public class Player : MonoBehaviour
         }
     }
 
-    private bool attack
-    {
-        get
-        {
-            return canSpawn && Input.GetMouseButtonDown(0) ? true : false;
-        }
-    }
-
     private bool isMoving
     {
         get
         {
             bool moving = direction.magnitude > 0 ? true : false;
+            if(!moving) controller.velocity = Vector3.zero;
             animator.SetBool("IsMoving", moving);
 
             return moving;
         }
     }
 
+    private bool isPerformingAnAction { get { return isAttacking || isDashing || isMoving || isSlashing ? true : false; } }
+
+    private bool dashActivated { get { return canDash && Input.GetKeyDown(KeyCode.LeftShift) ? true : false; } }
+    private bool slashActivated { get { return canSlash && Input.GetKeyDown(KeyCode.Space) ? true : false; } }
+    private bool shootActivated { get { return canShoot && Input.GetMouseButtonDown(0) ? true : false; } }
+
+
     #endregion
 
     private void Awake()
     {
         // initialize variables on awake
-        swordRange = GetComponentInChildren<PolygonCollider2D>();
-        controller = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        canSpawn = true;
-        canMove = true;
-        canDash = true;
-        CameraBehavior.target = transform;
+        swordRange  = GetComponentInChildren<PolygonCollider2D>();
+        spawner     = GetComponentInChildren<SpawnManager>();
 
-        health.SetMaxHealth(maxHealth);
-        currentHealth = maxHealth;
-
-        swordRange.gameObject.SetActive(false);
+        controller  = GetComponent<Rigidbody2D>();
+        animator    = GetComponent<Animator>();
 
         PlayerPrefs.SetInt("PreviousScene", currentScene);
+
+        StartCoroutine(InitializeVariables());
     }
 
     private void Update()
     {
         // grant access for enemies to act whenever you act
+        if (isDead) return;
         AccessGranter();
-        Death();
         Attack();
-        Slice();
+        Death();
+        Slash();
     }
 
     private void FixedUpdate()
     {
+        if (isDead) return;
         Walk();
-    }
-
-    #region Private Methods
-
-    private void Walk()
-    {
-        if (canDash && Input.GetKeyDown(KeyCode.LeftShift)) StartCoroutine(Dash());
-
-        if (!isMoving || !canMove) return;
-
-        velocity = Vector3.SmoothDamp(velocity, direction, ref currenVelocity, time);
-        controller.MovePosition(transform.position + velocity * speed * Time.fixedDeltaTime);
-    }
-
-    private void Attack()
-    {
-        if (isAttacking || isDashing || !attack) return;
-        StartCoroutine(SpawnAura());
-    }
-
-    private void Aim()
-    {
-        Vector3 target = mousePosition - transform.position;
-        animator.SetFloat("AtkY", target.normalized.y);
-        animator.SetFloat("AtkX", target.normalized.x);
-        rotator.rotation = Quaternion.FromToRotation(Vector2.right, target);
-    }
-
-    private void Slice()
-    {
-        if (!Input.GetKeyDown(KeyCode.Space) || isAttacking) return;
-        animator.SetTrigger("Slice");
     }
 
     public void TakeDamage(float damage)
@@ -179,18 +158,57 @@ public class Player : MonoBehaviour
         health.UpdateCurrentHealth(currentHealth);
     }
 
+    #region Private Methods
+
     private void AccessGranter()
     {
-        if (!SceneLoader.finishLoading) return;
-        accessToMove = isAttacking || isDashing || isMoving || enemiesAlwaysMoving ? true : false;
+        if (previousAccess == isPerformingAnAction) return;
+
+        accessToMove = isPerformingAnAction || enemiesAlwaysMoving ? true : false;
+
         LightingBehavior.targetSize = accessToMove ? litDown : litUp;
         CameraBehavior.zoomSize = accessToMove ? zoomIn : zoomOut;
+
+        previousAccess = isPerformingAnAction;
     }
 
-    private void Death()
+    private IEnumerator InitializeVariables()
     {
-        if (currentHealth > 0.1f) return;
-        loader.LoadScene(6);
+        isDead = true;
+
+        while (!SceneLoader.finishLoading)
+        { 
+            previousAccess = !isPerformingAnAction;
+            yield return null;
+        }
+
+        swordRange.gameObject.SetActive(false);
+
+        CameraBehavior.target = transform;
+
+        health.SetMaxHealth(maxHealth);
+        currentHealth = maxHealth;
+
+        canSlash = true;
+        canShoot = true;
+        canMove = true;
+        canDash = true;
+
+        isDead = false;
+
+        yield return null;
+    }
+
+    #region Move & Dash Mechanics
+
+    private void Walk()
+    {
+        if (dashActivated) StartCoroutine(Dash());
+
+        if (!isMoving || !canMove) return;
+
+        velocity = Vector3.SmoothDamp(velocity, direction, ref currenVelocity, time);
+        controller.MovePosition(transform.position + velocity * speed * Time.fixedDeltaTime);
     }
 
     private IEnumerator Dash()
@@ -198,7 +216,7 @@ public class Player : MonoBehaviour
         isDashing = true;
 
         canDash = false;
-        canSpawn = false;
+        canShoot = false;
         canMove = false;
 
         TrailRenderer trail = GetComponent<TrailRenderer>();
@@ -210,7 +228,7 @@ public class Player : MonoBehaviour
         controller.velocity = Vector2.zero;
 
         isDashing = false;
-        canSpawn = true;
+        canShoot = true;
         canMove = true;
 
         while(trail.time != 0)
@@ -223,35 +241,100 @@ public class Player : MonoBehaviour
         canDash = true;
     }
 
+    #endregion
+
+    #region Slash Mechanics
+
+    private void Slash()
+    {
+        if (!slashActivated) return;
+        StartCoroutine(PerformSlash());
+    }
+
+    private IEnumerator PerformSlash()
+    {
+        isSlashing = true;
+        canSlash = false;
+        animator.SetTrigger("Slice");
+        yield return new WaitForSeconds(slashDuration);
+        isSlashing = false;
+
+        yield return new WaitForSeconds(slashCooldown);
+        canSlash = true;
+        yield return null;
+    }
+
+    #endregion
+
+    #region Shoot Mechanics
+
+    private void Attack()
+    {
+        if (!shootActivated) return;
+        StartCoroutine(SpawnAura());
+    }
+
+    private void Aim()
+    {
+        Vector3 target = mousePosition - transform.position;
+        animator.SetFloat("AtkY", target.normalized.y);
+        animator.SetFloat("AtkX", target.normalized.x);
+        rotator.rotation = Quaternion.FromToRotation(Vector2.right, target);
+    }
+
     private IEnumerator SpawnAura()
     {
-        Aim();
         isAttacking = true;
 
         // stop player from moving and casting another spell
-        canSpawn = false;
+        canShoot = false;
         canMove = false;
+        canSlash = false;
 
         // spawn a clone of the said spell
         GameObject tempBullet = spawner.GetClone();
 
         // null catcher
         if (tempBullet == null) yield return null;
+        tempBullet.transform.parent = auraCaster;
 
         // set the position and orientation of the spell
+        Aim();
         tempBullet.transform.SetPositionAndRotation(auraCaster.position, auraCaster.rotation);
         tempBullet.SetActive(true);
         animator.SetTrigger("Aura");
+        tempBullet.transform.parent = null;
 
         // despawn aura
         yield return new WaitForSeconds(attackDuration);
         isAttacking = false;
         canMove = true;
+        canSlash = true;
 
         // cooldown
         yield return new WaitForSeconds(attackCooldown);
-        canSpawn = true;
+        canShoot = true;
     }
+
+    #endregion
+
+    #region Player Death
+
+    private void Death()
+    {
+        if (currentHealth > 0.1f) return;
+        isDead = true;
+        StartCoroutine(PlayerDeath());
+    }
+
+    private IEnumerator PlayerDeath()
+    {
+        accessToMove = false;
+        yield return new WaitForSeconds(deathDelay);
+        SceneManager.LoadScene(6);
+    }
+
+    #endregion
 
     #endregion
 }

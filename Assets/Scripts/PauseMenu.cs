@@ -12,19 +12,22 @@ public class PauseMenu : ButtonManager
     {
         animator = GetComponent<Animator>();
         menuIsUp = false;
+        rcwIsUp = false;
+        mmcwIsUp = false;
+        ecwIsUp = false;
     }
 
     private void Update()
     {
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
-        if (!menuIsUp) OpenMenu();
+        if (!menuIsUp) Pause();
         else if (rcwIsUp) CloseRCW();
         else if (mmcwIsUp) CloseMMCW();
         else if (ecwIsUp) CloseECW();
-        else CloseMenu();
+        else Resume();
     }
 
-    public void OpenMenu()
+    public void Pause()
     {
         // Pause
         Time.timeScale = 0;
@@ -33,7 +36,7 @@ public class PauseMenu : ButtonManager
         menuIsUp = true;
     }
 
-    public void CloseMenu()
+    public void Resume()
     {
         // Resume
         Time.timeScale = 1;
