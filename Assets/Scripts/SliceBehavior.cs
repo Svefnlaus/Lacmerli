@@ -5,14 +5,20 @@ public class SliceBehavior : StateMachineBehaviour
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         Player.canMove = false;
-        Player.swordRange.gameObject.SetActive(true);
+        TutorialPlayer.canMove = false;
         Player.accessToMove = true;
+        TutorialPlayer.accessToMove = true;
+        if (Player.swordRange != null) Player.swordRange.gameObject.SetActive(true);
+        if (TutorialPlayer.swordRange != null) TutorialPlayer.swordRange.gameObject.SetActive(true);
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         Player.canMove = true;
-        Player.swordRange.gameObject.SetActive(false);
+        TutorialPlayer.canMove = true;
         Player.accessToMove = false;
+        TutorialPlayer.accessToMove = false;
+        if (Player.swordRange != null) Player.swordRange.gameObject.SetActive(false);
+        if (TutorialPlayer.swordRange != null) TutorialPlayer.swordRange.gameObject.SetActive(false);
     }
 }

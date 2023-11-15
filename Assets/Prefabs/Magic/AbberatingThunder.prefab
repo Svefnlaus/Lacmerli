@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Intensity: 0.75
   m_LightVolumeIntensity: 2.5
   m_LightVolumeIntensityEnabled: 1
-  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b7f0e12f7
+  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b
   m_LightCookieSprite: {fileID: -1895700993, guid: 6ba3aa7a81993ba4c8c98bf92af6ff89, type: 3}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -188,8 +188,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c23309207cd5d439ad9f9777a8712c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 210647242790210517}
-  dissapearDelay: 0.25
   creepingDamage: 1
 --- !u!1 &5303789630761120607
 GameObject:
@@ -344,8 +342,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c23309207cd5d439ad9f9777a8712c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 210647242790210517}
-  dissapearDelay: 0.25
   creepingDamage: 1
 --- !u!1 &6104803767177217675
 GameObject:
@@ -500,8 +496,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c23309207cd5d439ad9f9777a8712c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 210647242790210517}
-  dissapearDelay: 0.25
   creepingDamage: 1
 --- !u!1 &6882018101222363823
 GameObject:
@@ -656,6 +650,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c23309207cd5d439ad9f9777a8712c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parent: {fileID: 210647242790210517}
-  dissapearDelay: 0.25
   creepingDamage: 1

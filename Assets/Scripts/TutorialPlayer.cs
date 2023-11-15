@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TutorialPlayer : MonoBehaviour
 {
@@ -8,12 +9,14 @@ public class TutorialPlayer : MonoBehaviour
     private Rigidbody2D controller;
     private Animator animator;
 
+    [SerializeField] private SceneLoader loader;
+    [SerializeField] private bool enemiesAlwaysMoving;
+
     [Space]
     [Header("Attack Settings")]
     [SerializeField] private SpawnManager spawner;
     [SerializeField] private Transform rotator;
     [SerializeField] private Transform auraCaster;
-    [SerializeField] private Transform cameraPan;
     [Range(0.1f, 10)][SerializeField] private float attackDuration;
     [Range(0.1f, 10)][SerializeField] private float attackCooldown;
 
@@ -25,6 +28,17 @@ public class TutorialPlayer : MonoBehaviour
     [Range(0.1f, 50)][SerializeField] private float dashDuration;
     [Range(0.1f, 50)][SerializeField] private float dashCooldown;
 
+    [Space]
+    [Header("Camera Settings")]
+    [Range(0.1f, 50)][SerializeField] private float zoomIn;
+    [Range(10f, 100)][SerializeField] private float zoomOut;
+
+    [Space]
+    [Header("Lights Settings")]
+    [Range(0.1f, 90)][SerializeField] private float litDown;
+    [Range(10f, 900)][SerializeField] private float litUp;
+    private int currentScene { get { return SceneManager.GetActiveScene().buildIndex; } }
+    public static PolygonCollider2D swordRange;
 
     #endregion
 
@@ -35,8 +49,8 @@ public class TutorialPlayer : MonoBehaviour
     private Vector3 velocity;
     private Vector3 currenVelocity;
 
+    public static bool canMove;
     private bool canSpawn;
-    private bool canMove;
     private bool canDash;
 
     private bool isAttacking;
@@ -47,7 +61,6 @@ public class TutorialPlayer : MonoBehaviour
         get
         {
             // prevent animator from rotating when attacking
-            animator.SetBool("IsAttacking", isAttacking);
             if (isAttacking) return Vector2.zero;
 
             float x = Input.GetAxisRaw("Horizontal");
@@ -60,11 +73,21 @@ public class TutorialPlayer : MonoBehaviour
         }
     }
 
+    private Vector3 mousePosition
+    {
+        get
+        {
+            Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mouse.z = 0;
+            return mouse;
+        }
+    }
+
     private bool attack
     {
         get
         {
-            return canSpawn && Input.GetKeyDown(KeyCode.Space) ? true : false;
+            return canSpawn && Input.GetMouseButtonDown(0) ? true : false;
         }
     }
 
@@ -84,24 +107,30 @@ public class TutorialPlayer : MonoBehaviour
     private void Awake()
     {
         // initialize variables on awake
+        swordRange = GetComponentInChildren<PolygonCollider2D>();
         controller = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         canSpawn = true;
         canMove = true;
         canDash = true;
         CameraBehavior.target = transform;
+
+        swordRange.gameObject.SetActive(false);
+
+        PlayerPrefs.SetInt("PreviousScene", currentScene);
     }
 
     private void Update()
     {
         // grant access for enemies to act whenever you act
         AccessGranter();
+        Attack();
+        Slice();
     }
 
     private void FixedUpdate()
     {
         Walk();
-        Attack();
     }
 
     #region Private Methods
@@ -109,37 +138,39 @@ public class TutorialPlayer : MonoBehaviour
     private void Walk()
     {
         if (canDash && Input.GetKeyDown(KeyCode.LeftShift)) StartCoroutine(Dash());
-        if (!isMoving || !canMove || isDashing || isAttacking) return;
+
+        if (!isMoving || !canMove) return;
+        Player.accessToMove = false;
         velocity = Vector3.SmoothDamp(velocity, direction, ref currenVelocity, time);
         controller.MovePosition(transform.position + velocity * speed * Time.fixedDeltaTime);
     }
 
     private void Attack()
     {
-        Aim();
-
-        if (isAttacking || !attack) return;
-        StartCoroutine(spawnAura());
+        if (isAttacking || isDashing || !attack) return;
+        StartCoroutine(SpawnAura());
     }
 
     private void Aim()
     {
-        if (!Input.anyKey || isAttacking) return;
+        Vector3 target = mousePosition - transform.position;
+        animator.SetFloat("AtkY", target.normalized.y);
+        animator.SetFloat("AtkX", target.normalized.x);
+        rotator.rotation = Quaternion.FromToRotation(Vector2.right, target);
+    }
 
-        // place the caster to where the player is facing
-        rotator.localEulerAngles = direction.y > 0 ? new Vector3(0, 0, 90) :
-            direction.x > 0 ? new Vector3(0, 0, 0) :
-            direction.x < 0 ? new Vector3(0, 0, 180) :
-            new Vector3(0, 0, -90);
-
-        // --- can adjust to look for mouse position instead --- //
+    private void Slice()
+    {
+        if (!Input.GetKeyDown(KeyCode.Space) || isAttacking) return;
+        animator.SetTrigger("Slice");
     }
 
     private void AccessGranter()
     {
         if (!SceneLoader.finishLoading) return;
-        accessToMove = isAttacking || isMoving ? true : false;
-        CameraBehavior.zoomSize = accessToMove ? 10 : 35;
+        accessToMove = isAttacking || isDashing || isMoving || enemiesAlwaysMoving ? true : false;
+        LightingBehavior.targetSize = accessToMove ? litDown : litUp;
+        CameraBehavior.zoomSize = accessToMove ? zoomIn : zoomOut;
     }
 
     private IEnumerator Dash()
@@ -172,9 +203,9 @@ public class TutorialPlayer : MonoBehaviour
         canDash = true;
     }
 
-
-    private IEnumerator spawnAura()
+    private IEnumerator SpawnAura()
     {
+        Aim();
         isAttacking = true;
 
         // stop player from moving and casting another spell
@@ -188,18 +219,14 @@ public class TutorialPlayer : MonoBehaviour
         if (tempBullet == null) yield return null;
 
         // set the position and orientation of the spell
-        tempBullet.transform.position = auraCaster.position;
-        tempBullet.transform.rotation = auraCaster.rotation;
+        tempBullet.transform.SetPositionAndRotation(auraCaster.position, auraCaster.rotation);
         tempBullet.SetActive(true);
-
-        CameraBehavior.target = cameraPan;
+        animator.SetTrigger("Aura");
 
         // despawn aura
         yield return new WaitForSeconds(attackDuration);
         isAttacking = false;
         canMove = true;
-
-        CameraBehavior.target = transform;
 
         // cooldown
         yield return new WaitForSeconds(attackCooldown);

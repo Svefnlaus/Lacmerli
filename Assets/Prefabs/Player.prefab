@@ -80,7 +80,7 @@ Transform:
   - {fileID: 707100439639188592}
   - {fileID: 438133593547802448}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3065026676943451032
 GameObject:
@@ -644,7 +644,7 @@ MonoBehaviour:
   - {x: -0.06758976, y: 0.4253261, z: 0}
   m_ShapePathHash: -1493700041
   m_Mesh: {fileID: 0}
-  m_InstanceId: -1372
+  m_InstanceId: 43252
   m_LocalBounds:
     m_Center: {x: 0.0021431446, y: 0.56352514, z: 0}
     m_Extent: {x: 0.37702584, y: 0.47775966, z: 0}
@@ -656,9 +656,9 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4540683448618811216}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -1185,7 +1185,7 @@ RectTransform:
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

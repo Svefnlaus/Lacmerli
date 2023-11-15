@@ -126,6 +126,7 @@ public class EnemyBehavior : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (target == null || spawner == null) return;
         DistanceChecker();
     }
 

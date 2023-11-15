@@ -173,7 +173,7 @@ AnimatorStateMachine:
     m_Position: {x: 30, y: 310, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 8581918365681953837}
-    m_Position: {x: 290, y: 190, z: 0}
+    m_Position: {x: -230, y: 180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2647289722437225419}
     m_Position: {x: 290, y: 40, z: 0}
@@ -186,9 +186,9 @@ AnimatorStateMachine:
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
-  m_AnyStatePosition: {x: 310, y: 130, z: 0}
-  m_EntryPosition: {x: -180, y: 190, z: 0}
-  m_ExitPosition: {x: -210, y: 80, z: 0}
+  m_AnyStatePosition: {x: -210, y: 310, z: 0}
+  m_EntryPosition: {x: -220, y: 50, z: 0}
+  m_ExitPosition: {x: 310, y: 310, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: 3073657243515129359}
 --- !u!1102 &-2647289722437225419
@@ -284,43 +284,43 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Y
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: IsMoving
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: AtkX
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: AtkY
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Slice
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Aura
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer

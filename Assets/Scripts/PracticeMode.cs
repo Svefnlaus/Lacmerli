@@ -70,7 +70,7 @@ public class PracticeMode : SpawnManager
 
         // set a length for the array of the positions
         usedPositions = new Vector2[numberOfEnemies];
-        usedPositions[0] = player.position;
+        usedPositions[0] = transform.position;
 
         // initialize the array of spawned enemies
         enemiesSpawned = new GameObject[numberOfEnemies];
@@ -90,7 +90,6 @@ public class PracticeMode : SpawnManager
             // catch null
             if (enemy == null) return;
             enemy.spawner = this;
-            enemy.target = player;
 
             // generate random position for enemies to spawn into
             enemiesSpawned[current].transform.position = RandomVectorGenerator(current);
