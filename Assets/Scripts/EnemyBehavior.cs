@@ -19,7 +19,7 @@ public class EnemyBehavior : MonoBehaviour
     [Range(0.01f, 5)][SerializeField] private float attackTime;
     [Range(0.01f, 5)][SerializeField] private float attackDelay;
     [Range(0.1f, 10)][SerializeField] private float attackCooldown;
-    [Range(0.1f, 50)][SerializeField] private float damageReceived;
+    [Range(0.1f, 50)][SerializeField] private float attackDamage;
 
     [Space] [Header("Health Settings")]
     [SerializeField] private HealthBar health;
@@ -100,7 +100,15 @@ public class EnemyBehavior : MonoBehaviour
 
     private float distance { get { return Vector2.Distance(transform.position, target.position); } }
 
-    private bool willError { get { return target == null || spawner == null || isDead ? true : false; } }
+    private bool willError
+    { 
+        get
+        {
+            bool errorCaught = target == null || spawner == null || isDead ? true : false;
+            if (errorCaught) controller.velocity = Vector2.zero;
+            return errorCaught;
+        }
+    }
 
     #endregion
 
@@ -186,6 +194,10 @@ public class EnemyBehavior : MonoBehaviour
         GameObject tempBullet = spawner.GetClone();
 
         if (tempBullet == null || gameObject == null) yield return null;
+
+        Magic tempMagic = tempBullet.GetComponent<Magic>();
+        tempMagic.damage = attackDamage;
+        tempMagic.chargeTime = attackTime;
 
         Aim();
 

@@ -245,7 +245,7 @@ MonoBehaviour:
   - {x: 0.063855745, y: -1.0040643, z: 0}
   m_ShapePathHash: -494978704
   m_Mesh: {fileID: 0}
-  m_InstanceId: 79044
+  m_InstanceId: 102784
   m_LocalBounds:
     m_Center: {x: 0.0008455515, y: -0.8775635, z: 0}
     m_Extent: {x: 0.21137473, y: 0.12770721, z: 0}
@@ -269,7 +269,7 @@ MonoBehaviour:
   attackTime: 0.75
   attackDelay: 0.75
   attackCooldown: 1.5
-  damageReceived: 2
+  attackDamage: 10
   health: {fileID: 1860816805203821379}
   maxHealth: 85
   showHealthDelay: 2

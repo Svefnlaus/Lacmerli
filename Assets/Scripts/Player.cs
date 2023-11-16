@@ -24,8 +24,10 @@ public class Player : MonoBehaviour
     [Space] [Header ("Attack Settings")]
     [SerializeField] private Transform rotator;
     [SerializeField] private Transform auraCaster;
-    [Range (0.1f, 10)] [SerializeField] private float attackDuration;
+    [Range (0.1f, 50)] [SerializeField] private float attackDamage;
+    [Range (0.1f, 10)] [SerializeField] private float attackCharge;
     [Range (0.1f, 10)] [SerializeField] private float attackCooldown;
+    [Range (0.1f, 10)] [SerializeField] private float attackDuration;
 
     [Space] [Header("Health Settings")]
     [SerializeField] private HealthBar health;
@@ -296,12 +298,19 @@ public class Player : MonoBehaviour
 
         // null catcher
         if (tempBullet == null) yield return null;
+
+        Magic tempMagic = tempBullet.GetComponent<Magic>();
+        tempMagic.damage = attackDamage;
+        tempMagic.chargeTime = attackCharge;
+        tempMagic.processing = false;
+
         tempBullet.transform.parent = auraCaster;
 
         // set the position and orientation of the spell
         Aim();
         tempBullet.transform.SetPositionAndRotation(auraCaster.position, auraCaster.rotation);
         tempBullet.SetActive(true);
+
         animator.SetTrigger("Aura");
         tempBullet.transform.parent = null;
 
@@ -331,7 +340,7 @@ public class Player : MonoBehaviour
     {
         accessToMove = false;
         yield return new WaitForSeconds(deathDelay);
-        SceneManager.LoadScene(6);
+        SceneManager.LoadScene(8);
     }
 
     #endregion

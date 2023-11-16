@@ -2,27 +2,26 @@ using UnityEngine;
 
 public class Hitbox : MonoBehaviour
 {
-    [SerializeField] private float damage;
-    private void OnTriggerStay2D(Collider2D other)
+    public float damage;
+    private void OnTriggerEnter2D(Collider2D other)
     {
         // try and get the said components, don't get just try to be more flexible
         other.TryGetComponent<EnemyBehavior>(out EnemyBehavior enemy);
+        other.TryGetComponent<BossBehavior>(out BossBehavior boss);
         other.TryGetComponent<Player>(out Player player);
 
         // damage either the player or the enemy depending on what you got on the component reader
-        DamageEnemy(enemy);
-        DamagePlayer(player);
+        if (enemy != null) DamageEnemy(enemy);
+        if (player != null) DamagePlayer(player);
+        if (boss != null) DamageBoss(boss);
     }
 
-    private void DamageEnemy(EnemyBehavior enemy)
-    {
-        if (enemy == null) return;
-        enemy.TakeDamage(damage);
-    }
+    private void DamageBoss(BossBehavior boss) { boss.TakeDamage(damage); }
+    private void DamageEnemy(EnemyBehavior enemy) { enemy.TakeDamage(damage); }
 
     private void DamagePlayer(Player player)
     {
-        if (player == null || CompareTag("Aura")) return;
+        if (CompareTag("Aura")) return;
         player.TakeDamage(damage);
     }
 }

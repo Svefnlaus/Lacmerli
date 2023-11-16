@@ -3,7 +3,7 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {
     [Header ("Armament Spawner Settings")]
-    [Range(1, 100)] [SerializeField] protected int spawnCount;
+    [Range(1, 1000)] [SerializeField] protected int spawnCount;
     [SerializeField] private GameObject[] spawnObject;
 
     private GameObject[] spawnedObjects;

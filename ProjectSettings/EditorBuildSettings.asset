@@ -15,6 +15,12 @@ EditorBuildSettings:
     path: Assets/Scenes/ArcadeScene.unity
     guid: b96ab3c7872965145ac2aa0fa0888717
   - enabled: 1
+    path: Assets/Scenes/ArcadeMidScene.unity
+    guid: d17690253d0624445af24f8d35ed48ed
+  - enabled: 1
+    path: Assets/Scenes/ArcadeBossMap.unity
+    guid: 9e6f7ccfabe10614ea4f9acb9809b7d0
+  - enabled: 1
     path: Assets/Scenes/LightsOutScene.unity
     guid: f3667a704bdb8944b9ea1145f9c5c652
   - enabled: 1

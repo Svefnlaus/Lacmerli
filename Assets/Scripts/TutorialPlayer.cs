@@ -17,6 +17,8 @@ public class TutorialPlayer : MonoBehaviour
     [SerializeField] private SpawnManager spawner;
     [SerializeField] private Transform rotator;
     [SerializeField] private Transform auraCaster;
+    [Range(0.1f, 50)][SerializeField] private float attackDamage;
+    [Range(0.1f, 10)][SerializeField] private float attackCharge;
     [Range(0.1f, 10)][SerializeField] private float attackDuration;
     [Range(0.1f, 10)][SerializeField] private float attackCooldown;
 
@@ -217,6 +219,11 @@ public class TutorialPlayer : MonoBehaviour
 
         // null catcher
         if (tempBullet == null) yield return null;
+
+        Magic tempMagic = tempBullet.GetComponent<Magic>();
+        tempMagic.damage = attackDamage;
+        tempMagic.chargeTime = attackCharge;
+        tempMagic.processing = false;
 
         // set the position and orientation of the spell
         tempBullet.transform.SetPositionAndRotation(auraCaster.position, auraCaster.rotation);

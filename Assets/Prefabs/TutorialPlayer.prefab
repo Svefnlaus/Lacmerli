@@ -742,4 +742,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnCount: 2
   spawnObject:
-  - {fileID: 4357817074601786947, guid: da3a00c11737e9847a7bf27d6d296ef6, type: 3}
+  - {fileID: 1896694009227159541, guid: da3a00c11737e9847a7bf27d6d296ef6, type: 3}

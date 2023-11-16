@@ -53,8 +53,9 @@ public class Objectives : MonoBehaviour
         UpdateObjectivesBoard();
 
         if (!coinsCollected || !enemiesCleared) return;
-
-        system.LoadScene(0);
+        int nextScene = PlayerPrefs.GetInt("PreviousScene") + 1;
+        if (nextScene == 4) nextScene = 10;
+        system.LoadScene(nextScene);
     }
 
     private void SurvivalMode()
@@ -73,7 +74,10 @@ public class Objectives : MonoBehaviour
         // ensure the set round is concatinated
         int round = PlayerPrefs.GetInt("Round") + 1;
         PlayerPrefs.SetInt("Round", round);
-        system.LoadScene(round <= 10 ? 3 : 10 < round && round < 50 ? 4 : 5);
+        int nextScene = round <= 10 ? 5 : 
+            10 < round && round < 50 ? 6 : 
+            50 < round && round <= 200 ? 7 : 9;
+        system.LoadScene(nextScene);
     }
 
     private void UpdateObjectivesBoard()

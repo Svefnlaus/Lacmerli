@@ -4,50 +4,40 @@ using UnityEngine;
 public class Magic : MonoBehaviour
 {
     [SerializeField] private GameObject sprite;
-    [SerializeField] private GameObject hitbox;
-    [SerializeField] private GameObject secondWave;
+    [SerializeField] private GameObject secondBlade;
 
-    [SerializeField] private Transform[] points;
-    
-    [Range(1, 500)]     [SerializeField] private float maxSpeed;
-    [Range(0.01f, 1)]   [SerializeField] private float smoothTime;
-    [Range(0.01f, 1)]   [SerializeField] private float shootDelay;
-    [Range(0.01f, 1)]   [SerializeField] private float hitboxDelay;
+    private ParticleSystem particle;
 
-    private Vector2 currentVelocity;
-    private bool isMoving;
+    public float damage;
+    public float chargeTime;
+
+    public bool processing;
+
+    private void Start()
+    {
+        particle = GetComponentInChildren<ParticleSystem>();
+
+        sprite.GetComponent<Hitbox>().damage = damage;
+        if (secondBlade != null) secondBlade.GetComponent<Hitbox>().damage = damage / 3;
+
+        var charge = particle.main;
+        charge.duration = chargeTime;
+    }
 
     private void Update()
     {
-        if (isMoving) return;
-        StartCoroutine(Motion());
+        if (processing) return;
+        sprite.SetActive(false);
+        if (secondBlade != null) secondBlade.SetActive(false);
+        StartCoroutine(ChargeAndShoot());
     }
 
-    private IEnumerator Motion()
+    public IEnumerator ChargeAndShoot()
     {
-        if (secondWave != null) secondWave.SetActive(true);
-        hitbox.SetActive(false);
-        sprite.SetActive(false);
-        isMoving = true;
-
-        // appear only after the effects is done
-        yield return new WaitForSeconds(shootDelay);
+        processing = true;
+        particle.Play();
+        yield return new WaitForSeconds (chargeTime * 2);
         sprite.SetActive(true);
-
-        // turn collider on once it is supposed to move
-        yield return new WaitForSeconds(hitboxDelay);
-        hitbox.SetActive(true);
-        hitbox.transform.position = points[0].position;
-
-        while (hitbox.transform.position != points[1].position)
-        {
-            hitbox.transform.position = Vector2.SmoothDamp(hitbox.transform.position, points[1].position, ref currentVelocity, smoothTime, maxSpeed);
-            yield return null;
-        }
-
-        isMoving = false;
-        gameObject.SetActive(false);
-
-        yield return null;
+        if (secondBlade != null) secondBlade.SetActive(true);
     }
 }
