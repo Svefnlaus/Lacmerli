@@ -10,6 +10,8 @@ public class CustomCursor : MonoBehaviour
     {
         get
         {
+            // animate on click
+            animator.SetBool("IsClicking", Input.GetMouseButton(0));
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             return mousePosition;
         }
@@ -24,9 +26,6 @@ public class CustomCursor : MonoBehaviour
 
     private void Update()
     {
-        // animate on click
-        animator.SetBool("IsClicking", Input.GetMouseButton(0));
-
         // prevent from updating when in idle
         if (mousePosition == lastPosition) return;
         lastPosition = mousePosition;

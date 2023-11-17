@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(Animator))]
 public class BossBehavior : MonoBehaviour
 {
     #region Static Variables
@@ -9,6 +10,13 @@ public class BossBehavior : MonoBehaviour
     [SerializeField] private Transform dump;
     [SerializeField] private Transform target;
     [SerializeField] private float bossTerritory;
+    [SerializeField] private float speed;
+    [SerializeField] private GameObject reward;
+
+    private Rigidbody2D controller;
+    private ParticleSystem particles;
+    private Animator animator;
+    private AudioSource soundFX;
 
     [Header ("Health Settings")]
     [SerializeField] private HealthBar health;
@@ -26,23 +34,30 @@ public class BossBehavior : MonoBehaviour
 
     [Range (0.1f, 100)] [SerializeField] private float throwForce;
     [Range (0.1f, 100)] [SerializeField] private float throwRange;
+    [Range (0.1f, 100)] [SerializeField] private float throwDamage;
     [Range (0.1f, 100)] [SerializeField] private float throwCooldown;
     [Range (0.1f,  10)] [SerializeField] private float throwDistance;
     [Range (0.1f,  10)] [SerializeField] private float throwInterval;
 
     [Header ("Ultimate Settings")]
     [SerializeField] private SpawnManager ultimate;
+    [SerializeField] private GameObject warning;
 
     [Range (1, 50)]     [SerializeField] private int lightningQuantity;
 
     [Range (0.1f, 100)] [SerializeField] private float ultimateCooldown;
+    [Range (0.1f, 100)] [SerializeField] private float ultimateDamage;
     [Range (0.1f, 100)] [SerializeField] private float ultimateRange;
-    [Range (0.1f,  10)] [SerializeField] private float ultimateDelay;
-    [Range (0.1f,  10)] [SerializeField] private float gap;
+    [Range (0.01f, 10)] [SerializeField] private float ultimateDelay;
+    [Range (0.01f, 10)] [SerializeField] private float chargeTime;
+    [Range (0.01f, 10)] [SerializeField] private float gap;
 
     #endregion
 
     #region Dynamic Variables
+
+    private Vector3 velocity;
+    private Vector3 currentVelocity;
 
     private Vector2[] setPositions;
 
@@ -52,42 +67,109 @@ public class BossBehavior : MonoBehaviour
     private bool canThrow;
     private bool canUlt;
 
+    private bool bossFightStarted;
+
     private float distance { get { return Vector2.Distance(transform.position, target.position); } }
+
+    private Vector3 direction
+    {
+        get
+        {
+            if (!canMove) return Vector2.zero;
+
+            // find player position
+            float x = transform.position.x < target.position.x ? 1 :
+                transform.position.x > target.position.x ? -1 : 0;
+            float y = transform.position.y < target.position.y ? 1 :
+                transform.position.y > target.position.y ? -1 : 0;
+
+            animator.SetFloat("X", x);
+            animator.SetFloat("Y", y);
+
+            return new Vector3(x, y, 0).normalized;
+        }
+    }
+
+    private bool isMoving
+    {
+        get
+        {
+            bool moving = direction.magnitude > 0.1 ? true : false;
+            if (!moving) controller.velocity = Vector3.zero;
+            animator.SetBool("IsWalking", moving);
+            return moving;
+        }
+    }
+
+    private bool playerIsDetected { get { return distance < bossTerritory; } }
 
     #endregion
 
     private void Awake()
     {
+        particles = GetComponentInChildren<ParticleSystem>();
+        controller = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        soundFX = GetComponent<AudioSource>();
+
         canMove = true;
         canThrow = true;
         canUlt = false;
+
+        bossFightStarted = false;
+
+        particles.Stop();
+        soundFX.Stop();
+
+        var charge = particles.main;
+        charge.duration = chargeTime;
     }
 
     private void Start()
     {
-        health.SetMaxHealth(maxHealth);
-        currentHealth = maxHealth;
-        health.gameObject.SetActive(false);
+        // always initialize health on start not on awake
+        InitializeBossHealth();
     }
 
     private void Update()
     {
+        if (!playerIsDetected) return;
+
+        BossMove();
+        InitializeBossBattle();
+
         if (canThrow) StartCoroutine(Throw());
         if (canUlt) StartCoroutine(Ultimate());
-        if (target == null) return;
-        ShowHealthBar();
     }
 
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
         health.UpdateCurrentHealth(currentHealth);
+        Death();
     }
 
-    private void ShowHealthBar()
+    private void InitializeBossBattle()
     {
-        if (distance > bossTerritory) return;
+        if (!playerIsDetected || bossFightStarted) return;
+        bossFightStarted = true;
+
         health.gameObject.SetActive(true);
+        soundFX.Play();
+    }
+
+    private void InitializeBossHealth()
+    {
+        health.SetMaxHealth(maxHealth);
+        currentHealth = maxHealth;
+        health.gameObject.SetActive(false);
+    }
+
+    private void BossMove()
+    {
+        if (!isMoving || !canMove) return;
+        velocity = Vector3.SmoothDamp(velocity, direction, ref currentVelocity, 0.01f);
+        controller.MovePosition(transform.position + velocity * speed * Time.fixedDeltaTime);
     }
 
     #region Throwing Mechanics
@@ -96,28 +178,50 @@ public class BossBehavior : MonoBehaviour
     {
         for (int current = 0; current < quantity; current++)
         {
+            // calculate circumference progress
             float thetaScale = (float)current / quantity;
+
+            // create a dot depending on where the circumference is currently at
             float theta = thetaScale * 2 * Mathf.PI;
 
+            // give the generated dot a distance depending on the specified radius
             float x = Mathf.Cos(theta) * radius;
             float y = Mathf.Sin(theta) * radius;
 
+            // generate a circumferencial coordinates using the dot
             Vector3 newPosition = new Vector2(x, y);
 
+            // get a clone of an object from a spawner
             GameObject throwable = throwables.GetClone();
             if (throwable == null) return;
+
+            // if the clone is not empty, set the object in motion
             SetInMotion(throwable, newPosition);
         }
     }
 
     private void SetInMotion(GameObject _object, Vector2 position)
     {
+        // parent to the rotor to move the positions according to the rotors orientation
         _object.transform.parent = rotor;
+
+        // assign the generated circumferencial position to the object
         _object.transform.localPosition = position;
+
+        // rotate the object to the relative position of spawner and said object
         Vector3 relativePosition = transform.position - _object.transform.position;
         _object.transform.localRotation = Quaternion.FromToRotation(Vector2.up, relativePosition);
+
+        // get component of the object to freely set the damage
+        _object.TryGetComponent<Throwables>(out Throwables thrownObj);
+        if (thrownObj == null) return;
+        thrownObj.damage = throwDamage;
+
+        // activate the object and make it move down, relatively, to not be affected by world's down position
         _object.SetActive(true);
-        _object.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.down * 15, ForceMode2D.Impulse);
+        _object.GetComponent<Rigidbody2D>().AddRelativeForce(Vector2.down * throwForce, ForceMode2D.Impulse);
+
+        // throw it in the dump to keep thing tidy
         _object.transform.parent = dump;
     }
 
@@ -145,8 +249,8 @@ public class BossBehavior : MonoBehaviour
 
         canMove = true;
 
-        yield return new WaitForSeconds(throwCooldown);
-        canThrow = true;
+        yield return new WaitForSeconds(ultimateCooldown);
+        canUlt = true;
     }
 
     #endregion
@@ -158,6 +262,14 @@ public class BossBehavior : MonoBehaviour
         canUlt = false;
         canMove = false;
         setPositions = new Vector2[lightningQuantity];
+
+        // initiate the charging particle and warning box, despawn after charging finished
+        particles.Play();
+        warning.SetActive(true);
+        yield return new WaitForSeconds(chargeTime);
+        warning.SetActive(false);
+
+        // generate random positions beforehand to keep things smooth
         GenerateRandomPosition();
 
         GameObject[] lightning = new GameObject[lightningQuantity];
@@ -165,11 +277,19 @@ public class BossBehavior : MonoBehaviour
         { 
             lightning[current] = ultimate.GetClone();
 
-            if (lightning[current] == null) yield return null;
+            if (lightning[current] == null) continue;
 
+            // assign the object on the generated position
             lightning[current].transform.parent = transform;
+
+            // specify creeeping damage
+            AbberatingThunder thunder = lightning[current].GetComponentInChildren<AbberatingThunder>();
+            if (thunder != null) thunder.creepingDamage = ultimateDamage;
+
             lightning[current].SetActive(true);
             lightning[current].transform.position = setPositions[current];
+
+            // put it in a dump to keep it tidy
             lightning[current].transform.parent = dump;
 
             yield return new WaitForSeconds(ultimateDelay);
@@ -177,8 +297,8 @@ public class BossBehavior : MonoBehaviour
 
         canMove = true;
 
-        yield return new WaitForSeconds(ultimateCooldown);
-        canUlt = true;
+        yield return new WaitForSeconds(throwCooldown);
+        canThrow = true;
     }
 
     private void GenerateRandomPosition()
@@ -192,36 +312,64 @@ public class BossBehavior : MonoBehaviour
 
     private void CheckPosition(int count)
     {
+        // initialize variables
         bool finished = false;
-        Vector2 currentPosition;
+
+        // debug testing purposes
         int attempt = 0;
+
         do
         {
             attempt++;
+
+            // randomly assign a coordinate
             int x = Mathf.RoundToInt(Random.Range(transform.position.x - ultimateRange, transform.position.x + ultimateRange));
             int y = Mathf.RoundToInt(Random.Range(transform.position.y - ultimateRange, transform.position.y + ultimateRange));
 
-            currentPosition = new Vector2(x, y);
+            Vector2 currentPosition = new Vector2(x, y);
 
+            // check if the said position is already on the list
             if (setPositions.Contains(currentPosition)) continue;
 
+            // if the said position is close to spawner then disregard
             float offset = Vector2.Distance(currentPosition, transform.position);
             if (offset < gap) continue;
 
+            // check for the distance of every preset positions to prevent from dropping on the same place
             for (int current = 0; current < setPositions.Length; current++)
             {
+                // assign a distance to serve as a gap for each summons
                 float distance = Vector2.Distance(currentPosition, setPositions[current]);
-
+                // if said gap was not attained, repeat the process
                 if (distance < gap) break;
 
+                // if that was true for the whole preset list, then finish the process
                 if (current == setPositions.Length - 1) finished = true;
             }
 
+            // if the process broke midway and was not finished, repeat the process
             if (!finished) continue;
             setPositions[count] = currentPosition;
-            Debug.Log("Position: " + (count + 1) + "\tAttempts: " + attempt);
 
-        } while (!finished);
+            // debug checking
+            Debug.Log("Position: " + (count + 1) + "\tAttempts: " + attempt);
+        }
+        while (!finished);
+    }
+
+    #endregion
+
+    #region Boss Death
+
+    private void Death()
+    {
+        if (currentHealth > 0.1) return;
+
+        // spawn a reward for killing the boss
+        Instantiate(reward, transform.position, Quaternion.identity, null);
+
+        // despawn parent to despawn other things such as UI and dumps
+        transform.parent.gameObject.SetActive(false);
     }
 
     #endregion

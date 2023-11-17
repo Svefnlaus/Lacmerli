@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.Loading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,7 +12,8 @@ public class SceneLoader : MonoBehaviour
     [SerializeField] private float loadingDelay;
     [SerializeField] private float loadingSpeed;
 
-    public static bool finishLoading;
+    private AsyncOperation loading;
+
     private bool destroy;
     private float loadingVelocity;
     private float loadingValue;
@@ -38,8 +40,8 @@ public class SceneLoader : MonoBehaviour
 
         yield return new WaitForSeconds(0.01f);
 
-        finishLoading = false;
-        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneIndex);
+        Player.finishLoadingScene = false;
+        loading = SceneManager.LoadSceneAsync(sceneIndex);
         loadingScreen.SetActive(true);
         loadingValue = 0;
 
@@ -52,8 +54,7 @@ public class SceneLoader : MonoBehaviour
         }
 
         yield return new WaitForSeconds(loadingDelay);
-
-        finishLoading = true;
+        Player.finishLoadingScene = true;
         destroy = true;
         loadingScreen.SetActive(false);
     }

@@ -13,6 +13,17 @@ public class TutorialPlayer : MonoBehaviour
     [SerializeField] private bool enemiesAlwaysMoving;
 
     [Space]
+    [Header("Sound FX")]
+    [SerializeField] private AudioSource swing;
+    [SerializeField] private AudioSource whoosh;
+
+    [Space]
+    [Header("Slash Settings")]
+    public static PolygonCollider2D swordRange;
+    [Range(0.1f, 10)][SerializeField] private float slashDuration;
+    [Range(0.1f, 10)][SerializeField] private float slashCooldown;
+
+    [Space]
     [Header("Attack Settings")]
     [SerializeField] private SpawnManager spawner;
     [SerializeField] private Transform rotator;
@@ -40,7 +51,6 @@ public class TutorialPlayer : MonoBehaviour
     [Range(0.1f, 90)][SerializeField] private float litDown;
     [Range(10f, 900)][SerializeField] private float litUp;
     private int currentScene { get { return SceneManager.GetActiveScene().buildIndex; } }
-    public static PolygonCollider2D swordRange;
 
     #endregion
 
@@ -54,9 +64,11 @@ public class TutorialPlayer : MonoBehaviour
     public static bool canMove;
     private bool canSpawn;
     private bool canDash;
+    private bool canSlash;
 
     private bool isAttacking;
     private bool isDashing;
+    private bool isSlashing;
 
     private Vector3 direction
     {
@@ -115,11 +127,14 @@ public class TutorialPlayer : MonoBehaviour
         canSpawn = true;
         canMove = true;
         canDash = true;
+        canSlash = true;
         CameraBehavior.target = transform;
 
         swordRange.gameObject.SetActive(false);
 
         PlayerPrefs.SetInt("PreviousScene", currentScene);
+
+        Player.isDead = false;
     }
 
     private void Update()
@@ -163,13 +178,26 @@ public class TutorialPlayer : MonoBehaviour
 
     private void Slice()
     {
-        if (!Input.GetKeyDown(KeyCode.Space) || isAttacking) return;
+        if (!canSlash || !Input.GetKeyDown(KeyCode.Space)) return;
+        StartCoroutine(PerformSlash());
+    }
+
+    private IEnumerator PerformSlash()
+    {
+        isSlashing = true;
+        canSlash = false;
         animator.SetTrigger("Slice");
+        swing.Play();
+        yield return new WaitForSeconds(slashDuration);
+        isSlashing = false;
+
+        yield return new WaitForSeconds(slashCooldown);
+        canSlash = true;
+        yield return null;
     }
 
     private void AccessGranter()
     {
-        if (!SceneLoader.finishLoading) return;
         accessToMove = isAttacking || isDashing || isMoving || enemiesAlwaysMoving ? true : false;
         LightingBehavior.targetSize = accessToMove ? litDown : litUp;
         CameraBehavior.zoomSize = accessToMove ? zoomIn : zoomOut;
@@ -187,6 +215,9 @@ public class TutorialPlayer : MonoBehaviour
 
         trail.time = 0.25f;
         controller.velocity = direction * dashForce;
+
+        if (controller.velocity.magnitude > 0.1) whoosh.Play();
+        else canDash = true;
 
         yield return new WaitForSeconds(dashDuration);
         controller.velocity = Vector2.zero;
@@ -228,7 +259,9 @@ public class TutorialPlayer : MonoBehaviour
         // set the position and orientation of the spell
         tempBullet.transform.SetPositionAndRotation(auraCaster.position, auraCaster.rotation);
         tempBullet.SetActive(true);
+
         animator.SetTrigger("Aura");
+        yield return new WaitForSeconds(attackCharge);
 
         // despawn aura
         yield return new WaitForSeconds(attackDuration);

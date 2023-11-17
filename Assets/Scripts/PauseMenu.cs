@@ -3,6 +3,7 @@ using UnityEngine;
 public class PauseMenu : ButtonManager
 {
     private Animator animator;
+    private AudioSource soundFX;
     private bool menuIsUp;
     private bool rcwIsUp;
     private bool mmcwIsUp;
@@ -11,6 +12,7 @@ public class PauseMenu : ButtonManager
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        soundFX = GetComponent<AudioSource>();
         menuIsUp = false;
         rcwIsUp = false;
         mmcwIsUp = false;
@@ -19,6 +21,7 @@ public class PauseMenu : ButtonManager
 
     private void Update()
     {
+        if (Player.isDead) return;
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
         if (!menuIsUp) Pause();
         else if (rcwIsUp) CloseRCW();
@@ -33,6 +36,7 @@ public class PauseMenu : ButtonManager
         Time.timeScale = 0;
 
         animator.SetTrigger("OpenMenu");
+        soundFX.Play();
         menuIsUp = true;
     }
 
@@ -42,6 +46,7 @@ public class PauseMenu : ButtonManager
         Time.timeScale = 1;
 
         animator.SetTrigger("CloseMenu");
+        soundFX.Play();
         menuIsUp = false;
     }
 
@@ -49,12 +54,14 @@ public class PauseMenu : ButtonManager
     public void OpenRCW()
     {
         animator.SetTrigger("OpenRCW");
+        soundFX.Play();
         rcwIsUp = true;
     }
 
     public void CloseRCW()
     {
         animator.SetTrigger("CloseRCW");
+        soundFX.Play();
         rcwIsUp = false;
     }
 
@@ -62,12 +69,14 @@ public class PauseMenu : ButtonManager
     public void OpenMMCW()
     {
         animator.SetTrigger("OpenMMCW");
+        soundFX.Play();
         mmcwIsUp = true;
     }
 
     public void CloseMMCW()
     {
         animator.SetTrigger("CloseMMCW");
+        soundFX.Play();
         mmcwIsUp = false;
     }
 
@@ -75,12 +84,14 @@ public class PauseMenu : ButtonManager
     public void OpenECW()
     {
         animator.SetTrigger("OpenECW");
+        soundFX.Play();
         ecwIsUp = true;
     }
 
     public void CloseECW()
     {
         animator.SetTrigger("CloseECW");
+        soundFX.Play();
         ecwIsUp = false;
     }
 }

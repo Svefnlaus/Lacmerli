@@ -1,5 +1,5 @@
+using System.Collections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Objectives : MonoBehaviour
@@ -15,6 +15,8 @@ public class Objectives : MonoBehaviour
     [SerializeField] private TMP_Text objectivesBillboard;
     [SerializeField] private SceneLoader system;
 
+    [SerializeField] private float loadDelay;
+
     private string gameMode;
     private bool objectiveCleared;
 
@@ -24,7 +26,7 @@ public class Objectives : MonoBehaviour
     private int coinsLeft { get { return totalCoins - coinsFound; } }
     private int enemiesLeft { get { return totalEnemies - enemiesSlain; } }
 
-    private void Awake()
+    private void Start()
     {
         if (system == null) return;
         coinsFound = 0;
@@ -33,13 +35,32 @@ public class Objectives : MonoBehaviour
         coinCount = totalCoins;
         objectiveCleared = false;
         gameMode = PlayerPrefs.GetString("GameMode");
+
+        UpdateObjectivesBoard();
     }
 
     private void Update()
     {
-        ArcadeMode();
         if (objectiveCleared) return;
-        SurvivalMode();   
+        ArcadeMode();
+        SurvivalMode();
+        BossMap();
+    }
+
+    private void BossMap()
+    {
+        if (gameMode != "Boss" || !rewriteObjectiveBoard) return;
+
+        enemyCount = enemiesLeft;
+        coinCount = coinsLeft;
+
+        UpdateObjectivesBoard();
+
+        if (!coinsCollected || !enemiesCleared) return;
+        objectiveCleared = true;
+
+        // load credits when finished
+        system.LoadScene(9);
     }
 
     private void ArcadeMode()
@@ -53,9 +74,12 @@ public class Objectives : MonoBehaviour
         UpdateObjectivesBoard();
 
         if (!coinsCollected || !enemiesCleared) return;
+        objectiveCleared = true;
+
         int nextScene = PlayerPrefs.GetInt("PreviousScene") + 1;
-        if (nextScene == 4) nextScene = 10;
-        system.LoadScene(nextScene);
+        if (nextScene == 4) PlayerPrefs.SetString("GameMode", "Boss");
+
+        StartCoroutine(SmoothTransition(nextScene));
     }
 
     private void SurvivalMode()
@@ -77,7 +101,8 @@ public class Objectives : MonoBehaviour
         int nextScene = round <= 10 ? 5 : 
             10 < round && round < 50 ? 6 : 
             50 < round && round <= 200 ? 7 : 9;
-        system.LoadScene(nextScene);
+
+        SmoothTransition(nextScene);
     }
 
     private void UpdateObjectivesBoard()
@@ -92,5 +117,14 @@ public class Objectives : MonoBehaviour
             (coinsLeft != 0 ? "Collect " + coinsLeft +
             (coinsLeft != totalCoins ? " more " : "") +
             " coin" + (coinsLeft > 1 ? "s" : "") : ""));
+    }
+
+    private IEnumerator SmoothTransition(int nextScene)
+    {
+        CameraBehavior.zoomSize = 1;
+        LightingBehavior.targetSize = 0;
+        yield return new WaitForSeconds(loadDelay);
+
+        system.LoadScene(nextScene);
     }
 }

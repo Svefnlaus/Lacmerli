@@ -1,4 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.SceneManagement;
 
 public class ButtonManager : MonoBehaviour
@@ -42,14 +44,16 @@ public class ButtonManager : MonoBehaviour
 
     public void PlayLightsOutMode()
     {
-        PlayerPrefs.SetInt("Round", 1);
         PlayerPrefs.SetString("GameMode", "Survival");
-        loader.LoadScene(3);
+        int round = PlayerPrefs.GetInt("Round");
+        int nextScene = round <= 10 ? 5 :
+        10 < round && round < 50 ? 6 : 7;
+        loader.LoadScene(nextScene);
     }
 
     public void InProgress()
     {
-        loader.LoadScene(8);
+        loader.LoadScene(10);
     }
 
     public void QuitGame()

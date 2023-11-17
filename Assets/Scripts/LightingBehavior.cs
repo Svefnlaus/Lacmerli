@@ -8,14 +8,12 @@ public class LightingBehavior : MonoBehaviour
     private float sizeVelocity;
     [SerializeField] private float maxSpeed;
 
-    private void Awake()
-    {
-        targetSize = 0;
-    }
+    private void Awake() { targetSize = 0; }
 
     private void LateUpdate()
     {
-        size = Mathf.SmoothDamp(size, targetSize, ref sizeVelocity, 0.01f, maxSpeed);
+        if (size == targetSize) return;
+        size = Mathf.SmoothDamp(size, targetSize, ref sizeVelocity, 0.01f, maxSpeed * (size > targetSize ? 2 : 1));
         GetComponent<Light2D>().pointLightOuterRadius = size;
     }
 }

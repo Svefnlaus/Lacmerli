@@ -8,17 +8,19 @@ public class EnemyBehavior : MonoBehaviour
 
     private Rigidbody2D controller;
     private Animator animator;
+    private AudioSource soundFX;
 
     [Space] [Header("Attack Settings")]
     public SpawnManager spawner;
     public Transform target;
+
     [Space]
     [SerializeField] private GameObject parent;
     [SerializeField] private Transform rotator;
     [SerializeField] private Transform caster;
     [Range(0.01f, 5)][SerializeField] private float attackTime;
     [Range(0.01f, 5)][SerializeField] private float attackDelay;
-    [Range(0.1f, 10)][SerializeField] private float attackCooldown;
+    [Range(0.01f, 5)][SerializeField] private float attackCooldown;
     [Range(0.1f, 50)][SerializeField] private float attackDamage;
 
     [Space] [Header("Health Settings")]
@@ -33,7 +35,6 @@ public class EnemyBehavior : MonoBehaviour
     [Space] [Header ("Speed Settings")]
     [Range(0.1f, 10)][SerializeField] private float speed;
     [Range(0.01f, 1)][SerializeField] private float smoothSpeed;
-    [Range(0.1f, 10)][SerializeField] private float rotationSpeed;
 
     #endregion
 
@@ -50,6 +51,8 @@ public class EnemyBehavior : MonoBehaviour
 
     private float currentHealth;
     private float previousHealth;
+
+    private float displayHealthTime;
 
     private Vector3 direction
     {
@@ -83,7 +86,7 @@ public class EnemyBehavior : MonoBehaviour
         get
         {
             animator.SetBool("IsAttacking", isAttacking);
-            return distance < attackRange && canAttack ? true : false;
+            return distance < attackRange && canAttack && !isAttacking ? true : false;
         }
     }
 
@@ -104,7 +107,7 @@ public class EnemyBehavior : MonoBehaviour
     { 
         get
         {
-            bool errorCaught = target == null || spawner == null || isDead ? true : false;
+            bool errorCaught = target == null || spawner == null || isDead || Player.isDead || this == null ? true : false;
             if (errorCaught) controller.velocity = Vector2.zero;
             return errorCaught;
         }
@@ -117,6 +120,7 @@ public class EnemyBehavior : MonoBehaviour
         // initialize variables
         controller = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        soundFX = GetComponent<AudioSource>();
 
         canAttack = true;
         canMove = true;
@@ -134,39 +138,39 @@ public class EnemyBehavior : MonoBehaviour
     private void Update()
     {
         if (willError) return;
-        Death();
         Attack();
+
+        // was put here to prevent dying in pratice mode
+        Death();
     }
 
     private void LateUpdate()
     {
         if (willError) return;
-        DistanceChecker();
-    }
-
-    #region Private Methods
-
-    private void DistanceChecker()
-    {
-        if (!isMoving || !playerIsDetected || isAttacking || distance < attackRange) return;
-        velocity = Vector3.SmoothDamp(velocity, direction, ref currentVelocity, smoothSpeed);
-        controller.MovePosition(transform.position + velocity * speed * Time.fixedDeltaTime);
-    }
-
-    private void Aim()
-    {
-        Vector2 relativePosition = target.position - rotator.position;
-        rotator.rotation = Quaternion.FromToRotation(Vector2.up, relativePosition);
-
-        animator.SetFloat("X", relativePosition.normalized.x);
-        animator.SetFloat("Y", relativePosition.normalized.y);
+        EnemyMove();
     }
 
     public void TakeDamage(float damage)
     {
+        health.gameObject.SetActive(true);
         currentHealth -= damage;
         health.UpdateCurrentHealth(currentHealth);
+
+        // show health bar when damaged
         StartCoroutine(showHealthBar());
+    }
+
+    #region Private Methods
+
+    private IEnumerator showHealthBar()
+    {
+        displayHealthTime += showHealthDelay;
+        while (displayHealthTime > 0.1)
+        {
+            displayHealthTime -= Time.deltaTime;
+            yield return null;
+        }
+        if (displayHealthTime < 0.1) health.gameObject.SetActive(false);
     }
 
     private void Death()
@@ -177,33 +181,60 @@ public class EnemyBehavior : MonoBehaviour
         parent.SetActive(false);
     }
 
+    private void EnemyMove()
+    {
+        // walk towards the player when the conditions are met
+        if (!isMoving || !playerIsDetected || isAttacking || distance < attackRange) return;
+        velocity = Vector3.SmoothDamp(velocity, direction, ref currentVelocity, smoothSpeed);
+        controller.MovePosition(transform.position + velocity * speed * Time.fixedDeltaTime);
+    }
+
+    #region Basic Attack Mechanics
+
+    private void Aim()
+    {
+        Vector2 relativePosition = target.position - rotator.position;
+        rotator.rotation = Quaternion.FromToRotation(Vector2.up, relativePosition);
+
+        animator.SetFloat("X", relativePosition.normalized.x);
+        animator.SetFloat("Y", relativePosition.normalized.y);
+    }
+
     private void Attack()
     {
         if (!readyToAttack) return;
-        canMove = false;
-        canAttack = false;
         StartCoroutine(attackPattern());
     }
 
     private IEnumerator attackPattern()
     {
-        if (spawner == null) yield return null;
-        isAttacking = true;
-        yield return new WaitForSeconds(attackDelay);
+        if (spawner == null || this == null) yield break;
 
         GameObject tempBullet = spawner.GetClone();
 
-        if (tempBullet == null || gameObject == null) yield return null;
+        if (tempBullet == null || gameObject == null) yield break;
 
-        Magic tempMagic = tempBullet.GetComponent<Magic>();
+        tempBullet.TryGetComponent<Magic>(out Magic tempMagic);
+
+        if (tempMagic == null) yield break;
+
+        canAttack = false;
+        canMove = false;
+
         tempMagic.damage = attackDamage;
-        tempMagic.chargeTime = attackTime;
+        tempMagic.chargeTime = attackDelay;
+
+        tempMagic.processing = false;
 
         Aim();
 
         tempBullet.transform.parent = parent.transform;
         tempBullet.transform.SetPositionAndRotation(caster.position, caster.rotation);
         tempBullet.SetActive(true);
+
+        soundFX.Play();
+        yield return new WaitForSeconds(attackDelay);
+        isAttacking = true;
 
         yield return new WaitForSeconds(attackTime);
         isAttacking = false;
@@ -213,14 +244,7 @@ public class EnemyBehavior : MonoBehaviour
         canAttack = true;
     }
 
-    private IEnumerator showHealthBar()
-    {
-        health.gameObject.SetActive(true);
-        yield return new WaitForSeconds(showHealthDelay);
-        if (currentHealth == previousHealth) health.gameObject.SetActive(false);
-        previousHealth = currentHealth;
-        yield return null;
-    }
+    #endregion
 
     #endregion
 }

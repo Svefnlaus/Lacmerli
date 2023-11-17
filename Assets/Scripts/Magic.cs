@@ -36,7 +36,7 @@ public class Magic : MonoBehaviour
     {
         processing = true;
         particle.Play();
-        yield return new WaitForSeconds (chargeTime * 2);
+        yield return new WaitForSeconds (chargeTime);
         sprite.SetActive(true);
         if (secondBlade != null) secondBlade.SetActive(true);
     }

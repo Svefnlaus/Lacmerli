@@ -24,7 +24,7 @@ public class CameraBehavior : MonoBehaviour
     private void Zoom()
     {
         if (zoomSize == zoom) return;
-        zoom = Mathf.SmoothDamp(zoom, zoomSize, ref zoomVelocity, 0.01f, zoomSpeed * (zoom > zoomSize ? 5 : 1));
+        zoom = Mathf.SmoothDamp(zoom, zoomSize, ref zoomVelocity, 0.01f, zoomSpeed * (zoom > zoomSize ? 3 : 1));
         GetComponent<Camera>().orthographicSize = zoom;
     }
 

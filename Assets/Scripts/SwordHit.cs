@@ -7,7 +7,11 @@ public class SwordHit : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         other.TryGetComponent<EnemyBehavior>(out EnemyBehavior enemy);
-        if (enemy == null) return;
-        enemy.TakeDamage(damage);
+        other.TryGetComponent<BossBehavior>(out BossBehavior boss);
+
+        if (enemy != null) enemy.TakeDamage(damage);
+
+        // slashes has triple damage on boss
+        if (boss != null) boss.TakeDamage(damage * 3);
     }
 }

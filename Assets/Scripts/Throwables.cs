@@ -1,10 +1,11 @@
+using System.Collections;
 using UnityEngine;
 
 public class Throwables : MonoBehaviour
 {
     public static Vector2 origin;
     public static float maxDistance;
-    private int damage;
+    public float damage;
 
     private void Update()
     {
@@ -13,17 +14,20 @@ public class Throwables : MonoBehaviour
         if (distance > maxDistance) this.gameObject.SetActive(false);
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Player")) DamagePlayer(other);
-        this.gameObject.SetActive(false);
+        other.TryGetComponent<Player>(out Player player);
+        if (player != null) player.TakeDamage(damage);
+
+        other.TryGetComponent<EnemyBehavior>(out EnemyBehavior enemy);
+        if (enemy != null) enemy.TakeDamage(damage);
+
+        StartCoroutine(DestroyOnCollide());
     }
 
-    private void DamagePlayer(Collision2D other)
+    private IEnumerator DestroyOnCollide()
     {
-        other.gameObject.TryGetComponent<Player>(out Player player);
-        if (player == null) return;
-        damage = Random.Range(-10, 50);
-        player.TakeDamage(damage);
+        yield return null;
+        this.gameObject.SetActive(false);
     }
 }

@@ -154,7 +154,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 0.0001
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 0
@@ -181,5 +181,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd4ebb7056a6b3a49872c17b720e6e55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  origin: {x: 0, y: 0}
-  maxDistance: 0
+  damage: 0
