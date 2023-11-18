@@ -135,7 +135,6 @@ MonoBehaviour:
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
   bar: {fileID: 6537391080097190042}
-  updateSpeed: 30
 --- !u!1 &900059638084091356
 GameObject:
   m_ObjectHideFlags: 0
@@ -830,7 +829,7 @@ MonoBehaviour:
   - {x: 0.063855745, y: -1.0040643, z: 0}
   m_ShapePathHash: -494978704
   m_Mesh: {fileID: 0}
-  m_InstanceId: 73634
+  m_InstanceId: 241654
   m_LocalBounds:
     m_Center: {x: 0.0008455515, y: -0.8775635, z: 0}
     m_Extent: {x: 0.21137473, y: 0.12770721, z: 0}
@@ -854,9 +853,9 @@ MonoBehaviour:
   attackTime: 0.15
   attackDelay: 0.25
   attackCooldown: 0.15
-  attackDamage: 20
+  attackDamage: 30
   health: {fileID: 3643014728458705350}
-  maxHealth: 85
+  maxHealth: 45
   showHealthDelay: 5
   detectionRange: 20
   attackRange: 7.5

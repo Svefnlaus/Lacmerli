@@ -5252,7 +5252,7 @@ GameObject:
   - component: {fileID: 2251601684788665924}
   m_Layer: 0
   m_Name: Boss
-  m_TagString: Untagged
+  m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5605,7 +5605,7 @@ GameObject:
   - component: {fileID: 1478120427889376304}
   m_Layer: 0
   m_Name: BossDump
-  m_TagString: Untagged
+  m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5740,7 +5740,7 @@ GameObject:
   - component: {fileID: 1423179330427294996}
   m_Layer: 0
   m_Name: BossSprite
-  m_TagString: Untagged
+  m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5886,8 +5886,8 @@ Rigidbody2D:
   m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
+  m_UseAutoMass: 1
+  m_Mass: 0.38484508
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 0
@@ -5897,7 +5897,7 @@ Rigidbody2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 383
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -5922,16 +5922,16 @@ MonoBehaviour:
   health: {fileID: 5719364122991708232}
   maxHealth: 600
   rotor: {fileID: 3239759203190565296}
-  rotationSpeed: 20
+  rotationSpeed: 75
   throwables: {fileID: 6315736792128270809}
   throwQuantity: 8
   throwSet: 10
   throwForce: 10
   throwRange: 15
   throwDamage: 15
-  throwCooldown: 1
-  throwDistance: 1.15
-  throwInterval: 0.1
+  throwCooldown: 2
+  throwDistance: 3
+  throwInterval: 0.15
   ultimate: {fileID: 3805475747740079572}
   warning: {fileID: 292981143064410379}
   lightningQuantity: 50
@@ -5939,6 +5939,8 @@ MonoBehaviour:
   ultimateDamage: 1
   ultimateRange: 15
   ultimateDelay: 0.025
+  quakeIntensity: 0.15
+  quakeDuration: 0.15
   chargeTime: 3.5
   gap: 1
 --- !u!82 &1423179330427294996
@@ -6100,7 +6102,7 @@ GameObject:
   - component: {fileID: 2885221405670110023}
   m_Layer: 0
   m_Name: BossUI
-  m_TagString: Untagged
+  m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

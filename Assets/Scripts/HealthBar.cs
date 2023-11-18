@@ -7,7 +7,6 @@ public class HealthBar : MonoBehaviour
     [SerializeField] private Canvas canvas;
     [SerializeField] private Gradient gradient;
     [SerializeField] private Image bar;
-    [SerializeField] private float updateSpeed;
 
     private Slider percentage;
     private float updateVelocity;
@@ -41,8 +40,8 @@ public class HealthBar : MonoBehaviour
         // read current health percentage
         while (percentage.value != target)
         {
-            percentage.value = Mathf.SmoothDamp(percentage.value, target, ref updateVelocity, 0.01f, updateSpeed);
-            yield return null;
+            percentage.value = Mathf.SmoothDamp(percentage.value, target, ref updateVelocity, 0.1f);
+            yield return new WaitForSeconds(Time.deltaTime);
         }
 
         // transform color depending on the health percentage

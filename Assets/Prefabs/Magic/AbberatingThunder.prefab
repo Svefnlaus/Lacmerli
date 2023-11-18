@@ -286,6 +286,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creepingDamage: 1
+  quakeDuration: 0
+  quakeIntensity: 0
 --- !u!1 &5303789630761120607
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,7 +343,7 @@ MonoBehaviour:
   m_Intensity: 0.75
   m_LightVolumeIntensity: 2.5
   m_LightVolumeIntensityEnabled: 1
-  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b7f0e12f737c0240f
+  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b
   m_LightCookieSprite: {fileID: -1115651382, guid: 5c68402caab02da4aa3ad252278ae73c, type: 3}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -440,6 +442,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creepingDamage: 1
+  quakeDuration: 0
+  quakeIntensity: 0
 --- !u!1 &6104803767177217675
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,7 +499,7 @@ MonoBehaviour:
   m_Intensity: 0.75
   m_LightVolumeIntensity: 2.5
   m_LightVolumeIntensityEnabled: 1
-  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b7f0e12f7
+  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b
   m_LightCookieSprite: {fileID: -1895700993, guid: 6ba3aa7a81993ba4c8c98bf92af6ff89, type: 3}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -594,6 +598,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creepingDamage: 1
+  quakeDuration: 0
+  quakeIntensity: 0
 --- !u!1 &6882018101222363823
 GameObject:
   m_ObjectHideFlags: 0
@@ -649,7 +655,7 @@ MonoBehaviour:
   m_Intensity: 0.75
   m_LightVolumeIntensity: 2.5
   m_LightVolumeIntensityEnabled: 1
-  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b7f0e12f737c0240f
+  m_ApplyToSortingLayers: 89bfbde0d7dc08f700000000657d3e9b
   m_LightCookieSprite: {fileID: -1115651382, guid: 5c68402caab02da4aa3ad252278ae73c, type: 3}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -748,3 +754,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creepingDamage: 1
+  quakeDuration: 0
+  quakeIntensity: 0

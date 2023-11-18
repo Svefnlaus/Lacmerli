@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Throwables : MonoBehaviour
 {
@@ -22,12 +23,6 @@ public class Throwables : MonoBehaviour
         other.TryGetComponent<EnemyBehavior>(out EnemyBehavior enemy);
         if (enemy != null) enemy.TakeDamage(damage);
 
-        StartCoroutine(DestroyOnCollide());
-    }
-
-    private IEnumerator DestroyOnCollide()
-    {
-        yield return null;
-        this.gameObject.SetActive(false);
+        if (!other.CompareTag("Boss")) this.gameObject.SetActive(false);
     }
 }

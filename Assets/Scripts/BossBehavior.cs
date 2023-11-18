@@ -13,10 +13,10 @@ public class BossBehavior : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private GameObject reward;
 
-    private Rigidbody2D controller;
     private ParticleSystem particles;
-    private Animator animator;
+    private Rigidbody2D controller;
     private AudioSource soundFX;
+    private Animator animator;
 
     [Header ("Health Settings")]
     [SerializeField] private HealthBar health;
@@ -49,6 +49,8 @@ public class BossBehavior : MonoBehaviour
     [Range (0.1f, 100)] [SerializeField] private float ultimateDamage;
     [Range (0.1f, 100)] [SerializeField] private float ultimateRange;
     [Range (0.01f, 10)] [SerializeField] private float ultimateDelay;
+    [Range (0.01f, 10)] [SerializeField] private float quakeIntensity;
+    [Range (0.01f, 10)] [SerializeField] private float quakeDuration;
     [Range (0.01f, 10)] [SerializeField] private float chargeTime;
     [Range (0.01f, 10)] [SerializeField] private float gap;
 
@@ -193,7 +195,7 @@ public class BossBehavior : MonoBehaviour
 
             // get a clone of an object from a spawner
             GameObject throwable = throwables.GetClone();
-            if (throwable == null) return;
+            if (throwable == null) continue;
 
             // if the clone is not empty, set the object in motion
             SetInMotion(throwable, newPosition);
@@ -284,7 +286,10 @@ public class BossBehavior : MonoBehaviour
 
             // specify creeeping damage
             AbberatingThunder thunder = lightning[current].GetComponentInChildren<AbberatingThunder>();
-            if (thunder != null) thunder.creepingDamage = ultimateDamage;
+            if (thunder == null) continue;
+            thunder.creepingDamage = ultimateDamage;
+            thunder.quakeIntensity = quakeIntensity;
+            thunder.quakeDuration = quakeDuration;
 
             lightning[current].SetActive(true);
             lightning[current].transform.position = setPositions[current];

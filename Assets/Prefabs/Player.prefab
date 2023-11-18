@@ -291,8 +291,84 @@ Transform:
   - {fileID: 438133593547802448}
   - {fileID: 1132842651481681865}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2038359393124218612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 595951483908152708}
+  - component: {fileID: 4901767002647876924}
+  - component: {fileID: 7286801778469945542}
+  m_Layer: 5
+  m_Name: DamageScreen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &595951483908152708
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038359393124218612}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 438133593547802448}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &4901767002647876924
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038359393124218612}
+  m_CullTransparentMesh: 1
+--- !u!114 &7286801778469945542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038359393124218612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.7254902, g: 0, b: 0, a: 0.4509804}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &2705055011165249830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1206,7 +1282,7 @@ MonoBehaviour:
   - {x: -0.06758976, y: 0.4253261, z: 0}
   m_ShapePathHash: -1493700041
   m_Mesh: {fileID: 0}
-  m_InstanceId: -1442
+  m_InstanceId: 236624
   m_LocalBounds:
     m_Center: {x: 0.0021431446, y: 0.56352514, z: 0}
     m_Extent: {x: 0.37702584, y: 0.47775966, z: 0}
@@ -1218,11 +1294,11 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4540683448618811216}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 10
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 0
@@ -1699,18 +1775,21 @@ MonoBehaviour:
   auraCaster: {fileID: 5257769922577790624}
   energyBar: {fileID: 6127137004613534542}
   attackDamage: 15
-  attackCharge: 0.35
-  attackCooldown: 0.35
-  attackDuration: 0.35
+  attackCharge: 0.25
+  attackCooldown: 0.25
+  attackDuration: 0.15
+  damageScreen: {fileID: 2038359393124218612}
   health: {fileID: 8852495929892261007}
   maxHealth: 80
   deathDelay: 1.35
+  damageShakeDuration: 0.25
+  damageShakeIntensity: 0.15
   dashBar: {fileID: 2722828813568016353}
   time: 0.1
   speed: 9
   dashForce: 18
-  dashDuration: 0.35
-  dashCooldown: 0.45
+  dashDuration: 0.25
+  dashCooldown: 0.15
   zoomIn: 5
   zoomOut: 15
   litDown: 10
@@ -1994,6 +2073,7 @@ RectTransform:
   - {fileID: 5182653886570551288}
   - {fileID: 1576850487599897172}
   - {fileID: 6131302414684138693}
+  - {fileID: 595951483908152708}
   m_Father: {fileID: 6479026164538746919}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2668,7 +2748,7 @@ MonoBehaviour:
     m_NumColorKeys: 4
     m_NumAlphaKeys: 3
   bar: {fileID: 8148425273946819903}
-  updateSpeed: 30
+  updateSpeed: 60
 --- !u!1 &7407040400114755573
 GameObject:
   m_ObjectHideFlags: 0

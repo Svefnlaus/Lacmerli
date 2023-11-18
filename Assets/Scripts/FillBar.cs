@@ -24,14 +24,5 @@ public class FillBar : MonoBehaviour
     {
         slider.value = value;
         fill.color = gradient.Evaluate(value);
-
-        /*if (value == 0) slider.value = 0;
-
-        float update = slider.value;
-
-        while (update != value)
-        {
-            update = Mathf.SmoothDamp(update, value, ref updateVelocity, .001f, 0.25f);
-        }*/
     }
 }

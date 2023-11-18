@@ -4,6 +4,8 @@ using UnityEngine;
 public class AbberatingThunder : MonoBehaviour
 {
     public float creepingDamage;
+    public float quakeDuration;
+    public float quakeIntensity;
 
     private void OnTriggerStay2D(Collider2D other)
     {
@@ -12,5 +14,10 @@ public class AbberatingThunder : MonoBehaviour
 
         other.TryGetComponent<EnemyBehavior>(out EnemyBehavior enemy);
         if (enemy != null) enemy.TakeDamage(creepingDamage);
+    }
+
+    public void QuakeOnDrop()
+    {
+        StartCoroutine(CameraBehavior.CameraShake(quakeDuration, quakeIntensity));
     }
 }

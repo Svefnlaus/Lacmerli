@@ -314,7 +314,7 @@ MonoBehaviour:
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
   bar: {fileID: 8053662568519220986}
-  updateSpeed: 30
+  updateSpeed: 60
 --- !u!1 &5208798789702641881
 GameObject:
   m_ObjectHideFlags: 0

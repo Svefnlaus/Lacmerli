@@ -177,8 +177,8 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (currentHealth > 0.1f) return;
         isDead = true;
+        animator.SetTrigger("Death");
         Objectives.enemiesSlain++;
-        parent.SetActive(false);
     }
 
     private void EnemyMove()

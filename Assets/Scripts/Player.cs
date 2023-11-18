@@ -37,9 +37,12 @@ public class Player : MonoBehaviour
     [Range (0.1f, 10)] [SerializeField] private float attackDuration;
 
     [Space] [Header("Health Settings")]
+    [SerializeField] private GameObject damageScreen;
     [SerializeField] private HealthBar health;
     [Range (10, 1000)] [SerializeField] private float maxHealth;
     [Range (0.1f, 10)] [SerializeField] private float deathDelay;
+    [Range (0.1f, 10)] [SerializeField] private float damageShakeDuration;
+    [Range (0.1f, 10)] [SerializeField] private float damageShakeIntensity;
 
     [Space] [Header ("Movement Settings")]
     [SerializeField] private FillBar dashBar;
@@ -83,7 +86,6 @@ public class Player : MonoBehaviour
     public static bool isDead;
 
     private float currentHealth;
-    private float currentEnergy;
 
     private Vector3 direction
     {
@@ -161,7 +163,6 @@ public class Player : MonoBehaviour
         animator    = GetComponent<Animator>();
 
         PlayerPrefs.SetInt("PreviousScene", currentScene);
-
     }
 
     private void Start()
@@ -195,15 +196,24 @@ public class Player : MonoBehaviour
     {
         // adds invulnerability when dashing
         // if (isInvulnerable) return;
+        StartCoroutine(CameraBehavior.CameraShake(damageShakeDuration, damageShakeIntensity));
+        StartCoroutine(DamageScreen());
         currentHealth -= damage;
         health.UpdateCurrentHealth(currentHealth);
+    }
+
+    private IEnumerator DamageScreen()
+    {
+        damageScreen.SetActive(true);
+        yield return new WaitForSeconds(Time.deltaTime);
+        damageScreen.SetActive(false);
     }
 
     private IEnumerator InitializeVariables()
     {
         isDead = true;
-
         swordRange.gameObject.SetActive(false);
+        damageScreen.SetActive(false);
 
         CameraBehavior.target = transform;
 
@@ -214,11 +224,11 @@ public class Player : MonoBehaviour
         canShoot = true;
         canMove = true;
         canDash = true;
-
         isDead = false;
-        previousAccess = !isPerformingAnAction;
 
         yield return null;
+
+        previousAccess = !isPerformingAnAction;
     }
 
     private void AccessGranter()
@@ -287,6 +297,11 @@ public class Player : MonoBehaviour
         isDashing = false;
         canMove = true;
 
+        //canShoot = true;
+        //yield return new WaitForSeconds(dashCooldown);
+        //canDash = true;
+
+        // cooldown
         StartCoroutine(Cooldown(dashBar, dashCooldown));
     }
 
@@ -374,6 +389,9 @@ public class Player : MonoBehaviour
         isAttacking = false;
         canMove = true;
         canSlash = true;
+
+        //yield return new WaitForSeconds(attackCooldown);
+        //canShoot = true;
 
         // cooldown
         StartCoroutine(Cooldown(energyBar, attackCooldown));
