@@ -67,7 +67,7 @@ GameObject:
   - component: {fileID: 2899404186941882075}
   m_Layer: 0
   m_Name: Second Blade
-  m_TagString: Untagged
+  m_TagString: Aura
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5050,7 +5050,7 @@ GameObject:
   - component: {fileID: 6162812230803145867}
   m_Layer: 0
   m_Name: First Blade
-  m_TagString: Untagged
+  m_TagString: Aura
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

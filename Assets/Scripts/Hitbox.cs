@@ -18,10 +18,5 @@ public class Hitbox : MonoBehaviour
 
     private void DamageBoss(BossBehavior boss) { boss.TakeDamage(damage); }
     private void DamageEnemy(EnemyBehavior enemy) { enemy.TakeDamage(damage); }
-
-    private void DamagePlayer(Player player)
-    {
-        if (CompareTag("Aura")) return;
-        player.TakeDamage(damage);
-    }
+    private void DamagePlayer(Player player) { if (!this.gameObject.CompareTag("Aura")) player.TakeDamage(damage); }
 }

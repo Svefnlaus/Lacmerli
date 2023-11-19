@@ -8,7 +8,7 @@ public class HealthBar : MonoBehaviour
     [SerializeField] private Gradient gradient;
     [SerializeField] private Image bar;
 
-    private Slider percentage;
+    public Slider percentage;
     private float updateVelocity;
 
     private void Awake()
@@ -29,22 +29,32 @@ public class HealthBar : MonoBehaviour
         bar.color = gradient.Evaluate(1);
     }
 
-    public void UpdateCurrentHealth(float target)
+    public void UpdateCurrentHealth(float targetHealth)
     {
         if (this == null) return;
-        StartCoroutine(SmoothHealthUpdate(target));
-    }
-
-    private IEnumerator SmoothHealthUpdate(float target)
-    {
-        // read current health percentage
-        while (percentage.value != target)
-        {
-            percentage.value = Mathf.SmoothDamp(percentage.value, target, ref updateVelocity, 0.1f);
-            yield return new WaitForSeconds(Time.deltaTime);
-        }
+        percentage.value = targetHealth;
 
         // transform color depending on the health percentage
         bar.color = gradient.Evaluate(percentage.normalizedValue);
     }
+
+    // needs fixing
+    /* private float currentHealth = percentage.maxValue;
+     * private IEnumerator SmoothHealthUpdate(float targetHealth)
+    {
+        currentHealth = Mathf.Clamp(currentHealth - targetHealth, 0, percentage.maxValue);
+
+        // read current health percentage
+        while (percentage.value != currentHealth)
+        {
+            // smoother damage display
+            percentage.value = Mathf.MoveTowards(percentage.value, currentHealth, 60 * Time.deltaTime);
+
+            // transform color depending on the health percentage
+            bar.color = gradient.Evaluate(percentage.normalizedValue);
+
+            yield return null;
+            // yield return new WaitForSeconds(Time.deltaTime);
+        }
+    }*/
 }

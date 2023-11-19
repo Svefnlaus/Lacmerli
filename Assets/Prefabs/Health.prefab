@@ -287,14 +287,14 @@ MonoBehaviour:
     serializedVersion: 2
     key0: {r: 1, g: 0, b: 0, a: 1}
     key1: {r: 1, g: 0.6818173, b: 0.0603773, a: 1}
-    key2: {r: 0.22856471, g: 0.9811321, b: 0.1147739, a: 0}
+    key2: {r: 0.13091001, g: 0.6886792, b: 0, a: 0}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 15613
-    ctime1: 35852
+    ctime0: 16384
+    ctime1: 36044
     ctime2: 65535
     ctime3: 0
     ctime4: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
   bar: {fileID: 8053662568519220986}
-  updateSpeed: 60
+  percentage: {fileID: 0}
 --- !u!1 &5208798789702641881
 GameObject:
   m_ObjectHideFlags: 0

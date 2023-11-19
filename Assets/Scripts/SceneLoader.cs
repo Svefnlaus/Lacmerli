@@ -37,25 +37,26 @@ public class SceneLoader : MonoBehaviour
     private IEnumerator Load(int sceneIndex)
     {
         Time.timeScale = 1;
-
-        yield return new WaitForSeconds(0.01f);
-
         Player.finishLoadingScene = false;
+        yield return null;
+
         loading = SceneManager.LoadSceneAsync(sceneIndex);
         loadingScreen.SetActive(true);
         loadingValue = 0;
 
-        while (loadingSlider.value != 1 || !loading.isDone)
+        while (loadingSlider.value != 1)
         {
             float progress = Mathf.Clamp01(loading.progress / 0.9f);
-            loadingValue = Mathf.SmoothDamp(loadingValue, progress, ref loadingVelocity, 0.01f, loadingSpeed);
-            loadingSlider.value = loadingValue;
-            yield return null;
+            loadingValue = Mathf.MoveTowards(loadingValue, progress, loadingSpeed * Time.deltaTime); //, ref loadingVelocity, 0.01f <<== SmoothDamp
+            loadingSlider.value = Mathf.Clamp01(loadingValue);
+            yield return new WaitForSeconds(Time.deltaTime);
         }
 
         yield return new WaitForSeconds(loadingDelay);
+
+        LightingBehavior.targetSize = 0;
         Player.finishLoadingScene = true;
-        destroy = true;
-        loadingScreen.SetActive(false);
+
+        Destroy(this.gameObject);
     }
 }

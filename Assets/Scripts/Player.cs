@@ -9,12 +9,15 @@ public class Player : MonoBehaviour
     private Rigidbody2D controller;
     private Animator animator;
     private SpawnManager spawner;
+    [SerializeField] private Transform dump;
 
     [Space] [Header ("Level Settings")]
     [SerializeField] private SceneLoader loader;
     [SerializeField] private GameObject gameOverScreen;
-    [SerializeField] private GameObject coinDisplay;
     [SerializeField] private GameObject objectivesBoard;
+    [SerializeField] private GameObject coinDisplay;
+
+    [Space]
     [SerializeField] private bool enemiesAlwaysMoving;
 
     [Space] [Header ("Sound FX")]
@@ -23,9 +26,9 @@ public class Player : MonoBehaviour
     [SerializeField] private AudioSource charge;
 
     [Space] [Header ("Slash Settings")]
-    public static PolygonCollider2D swordRange;
     [Range (0.1f, 10)] [SerializeField] private float slashDuration;
     [Range (0.1f, 10)] [SerializeField] private float slashCooldown;
+    public static PolygonCollider2D swordRange;
 
     [Space] [Header ("Attack Settings")]
     [SerializeField] private Transform rotator;
@@ -41,8 +44,8 @@ public class Player : MonoBehaviour
     [SerializeField] private HealthBar health;
     [Range (10, 1000)] [SerializeField] private float maxHealth;
     [Range (0.1f, 10)] [SerializeField] private float deathDelay;
-    [Range (0.1f, 10)] [SerializeField] private float damageShakeDuration;
-    [Range (0.1f, 10)] [SerializeField] private float damageShakeIntensity;
+    [Range (0.01f, 9)] [SerializeField] private float damageShakeDuration;
+    [Range (0.01f, 9)] [SerializeField] private float damageShakeIntensity;
 
     [Space] [Header ("Movement Settings")]
     [SerializeField] private FillBar dashBar;
@@ -126,8 +129,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    // private bool isInvulnerable { get { return isDashing && controller.velocity.magnitude > 0 ? true : false; } }
+
     private bool isPerformingAnAction { get { return isAttacking || isDashing || isMoving || isSlashing ? true : false; } }
-    private bool isInvulnerable { get { return isDashing && controller.velocity.magnitude > 0 ? true : false; } }
 
     private bool shootActivated
     {
@@ -147,11 +151,18 @@ public class Player : MonoBehaviour
     }
     private bool slashActivated { get { return canSlash && Input.GetKeyDown(KeyCode.Space) ? true : false; } }
 
-    private bool objectiveIsDone { get { return Objectives.coinsFound == Objectives.totalCoins
-                && Objectives.enemiesSlain == Objectives.totalEnemies; } }
+    private bool objectiveIsDone 
+    {
+        get
+        {
+            return Objectives.coinsFound == Objectives.totalCoins && Objectives.enemiesSlain == Objectives.totalEnemies;
+        }
+    }
 
 
     #endregion
+
+    #region Unity Methods
 
     private void Awake()
     {
@@ -162,24 +173,29 @@ public class Player : MonoBehaviour
         controller  = GetComponent<Rigidbody2D>();
         animator    = GetComponent<Animator>();
 
+        CameraBehavior.target = transform;
+
         PlayerPrefs.SetInt("PreviousScene", currentScene);
+
+        InitializeVariables();
     }
 
     private void Start()
     {
-        StartCoroutine(InitializeVariables());
+
+        health.SetMaxHealth(maxHealth);
+        currentHealth = maxHealth;
     }
 
     private void Update()
     {
         if (isDead) return;
+
         // grant access for enemies to act whenever you act
         AccessGranter();
 
         Attack();
-        Death();
         Slash();
-        StartCoroutine(Dash());
     }
 
     private void FixedUpdate()
@@ -187,6 +203,8 @@ public class Player : MonoBehaviour
         if (isDead) return;
         Walk();
     }
+
+    #endregion
 
     #region Methods
 
@@ -196,29 +214,29 @@ public class Player : MonoBehaviour
     {
         // adds invulnerability when dashing
         // if (isInvulnerable) return;
-        StartCoroutine(CameraBehavior.CameraShake(damageShakeDuration, damageShakeIntensity));
-        StartCoroutine(DamageScreen());
-        currentHealth -= damage;
+
+        // update health depending on the damage taken
+        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
         health.UpdateCurrentHealth(currentHealth);
+
+        // shake the screen depending on how much damage you took
+        StartCoroutine(CameraBehavior.CameraShake(damageShakeDuration, damageShakeIntensity * damage));
+        StartCoroutine(DamageScreen());
+
+        Death();
     }
 
     private IEnumerator DamageScreen()
     {
         damageScreen.SetActive(true);
-        yield return new WaitForSeconds(Time.deltaTime);
+        yield return new WaitForSeconds(Time.fixedDeltaTime);
         damageScreen.SetActive(false);
     }
 
-    private IEnumerator InitializeVariables()
+    private void InitializeVariables()
     {
-        isDead = true;
         swordRange.gameObject.SetActive(false);
         damageScreen.SetActive(false);
-
-        CameraBehavior.target = transform;
-
-        health.SetMaxHealth(maxHealth);
-        currentHealth = maxHealth;
 
         canSlash = true;
         canShoot = true;
@@ -226,9 +244,7 @@ public class Player : MonoBehaviour
         canDash = true;
         isDead = false;
 
-        yield return null;
-
-        previousAccess = !isPerformingAnAction;
+        previousAccess = true;
     }
 
     private void AccessGranter()
@@ -257,11 +273,11 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region Move & Dash Mechanics
+    #region Movement Mechanics
 
     private void Walk()
     {
-
+        if (isMoving) StartCoroutine(Dash());
         if (!isMoving || !canMove) return;
 
         velocity = Vector3.SmoothDamp(velocity, direction, ref currenVelocity, time);
@@ -272,9 +288,6 @@ public class Player : MonoBehaviour
     {
         if (!dashActivated) yield break;
 
-        controller.velocity = direction * dashForce;
-        if (controller.velocity.magnitude <= 0.1) yield break;
-
         dashBar.UpdateFillBar(0);
         isDashing = true;
         canMove = false;
@@ -282,6 +295,8 @@ public class Player : MonoBehaviour
         TryGetComponent<TrailRenderer>(out TrailRenderer trail);
         if (trail == null) yield break;
         trail.time = 0.25f;
+
+        controller.velocity = direction * dashForce;
 
         whoosh.Play();
 
@@ -382,7 +397,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(attackCharge);
 
         animator.SetTrigger("Aura");
-        tempBullet.transform.parent = null;
+        tempBullet.transform.parent = dump;
 
         // despawn aura
         yield return new WaitForSeconds(attackDuration);
@@ -403,20 +418,25 @@ public class Player : MonoBehaviour
 
     private void Death()
     {
-        if (currentHealth > 0.1f) return;
+        if (health.percentage.value >= 0.1 || isDead) return;
         isDead = true;
-        PlayerDeath();
+        StartCoroutine(PlayerDeath());
     }
 
-    private void PlayerDeath()
+    private IEnumerator PlayerDeath()
     {
-        gameOverScreen.SetActive(true);
+        if (CameraBehavior.cmBrain != null) CameraBehavior.cmBrain.enabled = false;
+        CameraBehavior.canMove = true;
         CameraBehavior.zoomSize = 1;
-        LightingBehavior.targetSize = 0;
+        LightingBehavior.targetSize = 2;
+        yield return null;
+
+        gameOverScreen.SetActive(true);
         health.gameObject.SetActive(false);
         coinDisplay.SetActive(false);
         objectivesBoard.SetActive(false);
         accessToMove = false;
+        yield return new WaitForSeconds(Time.deltaTime);
     }
 
     #endregion

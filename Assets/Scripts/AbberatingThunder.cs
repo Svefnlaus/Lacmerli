@@ -20,4 +20,10 @@ public class AbberatingThunder : MonoBehaviour
     {
         StartCoroutine(CameraBehavior.CameraShake(quakeDuration, quakeIntensity));
     }
+
+    private void OnDisable()
+    {
+        CameraBehavior.canMove = true;
+        if (CameraBehavior.cmBrain != null) CameraBehavior.cmBrain.enabled = true;
+    }
 }

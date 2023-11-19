@@ -617,24 +617,24 @@ MonoBehaviour:
   enemiesAlwaysMoving: 0
   swing: {fileID: 213772764873788690}
   whoosh: {fileID: 824879288321421955}
-  slashDuration: 0.425
+  slashDuration: 0.475
   slashCooldown: 0.15
   spawner: {fileID: 9127531664500531715}
   rotator: {fileID: 6074825714971995785}
   auraCaster: {fileID: 3814738749808777454}
   attackDamage: 15
-  attackCharge: 0.35
-  attackDuration: 0.35
-  attackCooldown: 0.35
+  attackCharge: 0.15
+  attackDuration: 0.25
+  attackCooldown: 0.15
   time: 0.1
   speed: 9
   dashForce: 18
-  dashDuration: 0.35
-  dashCooldown: 0.35
-  zoomIn: 0
-  zoomOut: 0
-  litDown: 0
-  litUp: 0
+  dashDuration: 0.25
+  dashCooldown: 0.15
+  zoomIn: 5
+  zoomOut: 15
+  litDown: 10
+  litUp: 45
 --- !u!1 &4921882727633054370
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,7 +962,7 @@ Transform:
   - {fileID: 1400893949527494153}
   - {fileID: 4235443049667330945}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8736542211209697207
 GameObject:

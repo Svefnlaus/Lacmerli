@@ -9,9 +9,12 @@ public class BossBehavior : MonoBehaviour
     [Header ("Boss Settings")]
     [SerializeField] private Transform dump;
     [SerializeField] private Transform target;
+    [SerializeField] private GameObject reward;
+
+    [SerializeField] private Animator cutScene;
+
     [SerializeField] private float bossTerritory;
     [SerializeField] private float speed;
-    [SerializeField] private GameObject reward;
 
     private ParticleSystem particles;
     private Rigidbody2D controller;
@@ -52,7 +55,7 @@ public class BossBehavior : MonoBehaviour
     [Range (0.01f, 10)] [SerializeField] private float quakeIntensity;
     [Range (0.01f, 10)] [SerializeField] private float quakeDuration;
     [Range (0.01f, 10)] [SerializeField] private float chargeTime;
-    [Range (0.01f, 10)] [SerializeField] private float gap;
+    //[Range (0.01f, 10)] [SerializeField] private float gap;
 
     #endregion
 
@@ -65,9 +68,13 @@ public class BossBehavior : MonoBehaviour
 
     private float currentHealth;
 
+    private float gap;
+
     private bool canMove;
     private bool canThrow;
     private bool canUlt;
+
+    private bool isDead;
 
     private bool bossFightStarted;
 
@@ -107,6 +114,8 @@ public class BossBehavior : MonoBehaviour
 
     #endregion
 
+    #region Unity Methods
+
     private void Awake()
     {
         particles = GetComponentInChildren<ParticleSystem>();
@@ -117,6 +126,8 @@ public class BossBehavior : MonoBehaviour
         canMove = true;
         canThrow = true;
         canUlt = false;
+
+        isDead = false;
 
         bossFightStarted = false;
 
@@ -131,24 +142,37 @@ public class BossBehavior : MonoBehaviour
     {
         // always initialize health on start not on awake
         InitializeBossHealth();
+        StartCoroutine(BossCutScene());
     }
 
     private void Update()
     {
-        if (!playerIsDetected) return;
+        if (!playerIsDetected || isDead) return;
 
-        BossMove();
+        BossReposition();
         InitializeBossBattle();
 
         if (canThrow) StartCoroutine(Throw());
         if (canUlt) StartCoroutine(Ultimate());
     }
 
+    #endregion
+
+    #region Miscellaneous
+
     public void TakeDamage(float damage)
     {
-        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
         health.UpdateCurrentHealth(currentHealth);
         Death();
+    }
+
+    private IEnumerator BossCutScene()
+    {
+        Player.finishLoadingScene = false;
+        cutScene.SetTrigger("CutScene");
+        yield return new WaitForSeconds(8.75f);
+        Player.finishLoadingScene = true;
     }
 
     private void InitializeBossBattle()
@@ -167,12 +191,14 @@ public class BossBehavior : MonoBehaviour
         health.gameObject.SetActive(false);
     }
 
-    private void BossMove()
+    private void BossReposition()
     {
         if (!isMoving || !canMove) return;
         velocity = Vector3.SmoothDamp(velocity, direction, ref currentVelocity, 0.01f);
         controller.MovePosition(transform.position + velocity * speed * Time.fixedDeltaTime);
     }
+
+    #endregion
 
     #region Throwing Mechanics
 
@@ -229,6 +255,7 @@ public class BossBehavior : MonoBehaviour
 
     private IEnumerator Throw()
     {
+        if (distance > throwRange) yield break;
         canThrow = false;
         canMove = false;
         Throwables.origin = transform.position;
@@ -261,15 +288,14 @@ public class BossBehavior : MonoBehaviour
 
     private IEnumerator Ultimate()
     {
+        if (distance > ultimateRange) yield break;
         canUlt = false;
         canMove = false;
         setPositions = new Vector2[lightningQuantity];
 
         // initiate the charging particle and warning box, despawn after charging finished
         particles.Play();
-        warning.SetActive(true);
         yield return new WaitForSeconds(chargeTime);
-        warning.SetActive(false);
 
         // generate random positions beforehand to keep things smooth
         GenerateRandomPosition();
@@ -292,7 +318,7 @@ public class BossBehavior : MonoBehaviour
             thunder.quakeDuration = quakeDuration;
 
             lightning[current].SetActive(true);
-            lightning[current].transform.position = setPositions[current];
+            lightning[current].transform.localPosition = setPositions[current];
 
             // put it in a dump to keep it tidy
             lightning[current].transform.parent = dump;
@@ -308,6 +334,11 @@ public class BossBehavior : MonoBehaviour
 
     private void GenerateRandomPosition()
     {
+        gap = (ultimateRange - 1) / (lightningQuantity / ultimateRange) / 2;
+        if (gap < 1) Debug.Log("Error Distance");
+        if (gap < 1) return;
+        Debug.Log("Gap: " + gap);
+
         setPositions[0] = transform.position;
         for (int current = 0; current < setPositions.Length; current++)
         {
@@ -328,8 +359,8 @@ public class BossBehavior : MonoBehaviour
             attempt++;
 
             // randomly assign a coordinate
-            int x = Mathf.RoundToInt(Random.Range(transform.position.x - ultimateRange, transform.position.x + ultimateRange));
-            int y = Mathf.RoundToInt(Random.Range(transform.position.y - ultimateRange, transform.position.y + ultimateRange));
+            float x = Random.Range(-ultimateRange, ultimateRange);
+            float y = Random.Range(-ultimateRange, ultimateRange);
 
             Vector2 currentPosition = new Vector2(x, y);
 
@@ -357,7 +388,7 @@ public class BossBehavior : MonoBehaviour
             setPositions[count] = currentPosition;
 
             // debug checking
-            Debug.Log("Position: " + (count + 1) + "\tAttempts: " + attempt);
+            Debug.Log("Position: " + (count + 1) + "\tAttempts: " + attempt + "\t:\t" + currentPosition);
         }
         while (!finished);
     }
@@ -368,13 +399,15 @@ public class BossBehavior : MonoBehaviour
 
     private void Death()
     {
-        if (currentHealth > 0.1) return;
+        if (health.percentage.value >= 0.1 || isDead) return;
+        isDead = true;
+        animator.SetTrigger("Death");
+    }
 
+    private void OnDisable()
+    {
         // spawn a reward for killing the boss
         Instantiate(reward, transform.position, Quaternion.identity, null);
-
-        // despawn parent to despawn other things such as UI and dumps
-        transform.parent.gameObject.SetActive(false);
     }
 
     #endregion

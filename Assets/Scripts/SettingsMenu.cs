@@ -14,16 +14,14 @@ public class SettingsMenu : MonoBehaviour
 
     private Resolution[] resolutions;
 
+    private int resolutionUsed;
+
     private float defaultVolume { get { return PlayerPrefs.HasKey("DefaultVolume") ? PlayerPrefs.GetFloat("DefaultVolume") : 0; } }
     private int defaultQuality { get { return PlayerPrefs.HasKey("DefaultQuality") ? PlayerPrefs.GetInt("DefaultQuality") : 0; } }
     private bool defaultScreen { get { return PlayerPrefs.HasKey("DefaultScreen") ? PlayerPrefs.GetInt("DefaultScreen") != 0 : true; } }
-    private int defaultResolution { get { return PlayerPrefs.HasKey("DefaultResolution") ? PlayerPrefs.GetInt("DefaultResolution") : 0; } }
+    private int defaultResolution { get { return PlayerPrefs.HasKey("DefaultResolution") ? PlayerPrefs.GetInt("DefaultResolution") : resolutionUsed; } }
 
-    private void Awake()
-    {
-        resolutions = Screen.resolutions;
-        CreateResolutionList();
-    }
+    private void Awake() { CreateResolutionList(); }
 
     private void Start()
     {
@@ -44,6 +42,8 @@ public class SettingsMenu : MonoBehaviour
 
     private void CreateResolutionList()
     {
+        resolutions = Screen.resolutions;
+
         resolutionDropdown.ClearOptions();
 
         List<string> options = new List<string>();
@@ -58,6 +58,8 @@ public class SettingsMenu : MonoBehaviour
             currentResolution = resolutions[current].width == Screen.currentResolution.width
                 && resolutions[current].height == Screen.currentResolution.height ? current : currentResolution;
         }
+
+        resolutionUsed = currentResolution;
 
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.value = currentResolution;

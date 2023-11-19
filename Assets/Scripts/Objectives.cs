@@ -23,8 +23,8 @@ public class Objectives : MonoBehaviour
     private bool enemiesCleared { get { return enemiesSlain == totalEnemies; } }
     private bool coinsCollected { get { return coinsFound == totalCoins; } }
     private bool rewriteObjectiveBoard { get { return enemiesLeft == enemyCount && coinsLeft == coinCount ? false : true; } }
-    private int coinsLeft { get { return totalCoins - coinsFound; } }
-    private int enemiesLeft { get { return totalEnemies - enemiesSlain; } }
+    private int coinsLeft { get { return totalCoins - coinsFound; } set { } }
+    private int enemiesLeft { get { return totalEnemies - enemiesSlain; } set { } }
 
     private void Start()
     {
@@ -42,9 +42,18 @@ public class Objectives : MonoBehaviour
     private void Update()
     {
         if (objectiveCleared) return;
+        ClampValues();
         ArcadeMode();
         SurvivalMode();
         BossMap();
+    }
+
+    private void ClampValues()
+    {
+        if (coinsLeft <= 0) coinsLeft = 0;
+        if (enemiesLeft <= 0) enemiesLeft = 0;
+        if (coinsFound >= totalCoins) coinsFound = totalCoins;
+        if (enemiesSlain >= totalEnemies) enemiesSlain = totalEnemies;
     }
 
     private void BossMap()
@@ -110,11 +119,11 @@ public class Objectives : MonoBehaviour
         objectivesBillboard.SetText(
             "Objectives:\n\n" +
 
-            (enemiesLeft != 0 ? "Kill " + enemiesLeft +
+            (enemiesLeft > 0 ? "Kill " + enemiesLeft +
             (enemiesLeft != totalEnemies ? " more " : "") +
             " enem" + (enemiesLeft > 1 ? "ies" : "y") + "\n" : "") +
 
-            (coinsLeft != 0 ? "Collect " + coinsLeft +
+            (coinsLeft > 0 ? "Collect " + coinsLeft +
             (coinsLeft != totalCoins ? " more " : "") +
             " coin" + (coinsLeft > 1 ? "s" : "") : ""));
     }

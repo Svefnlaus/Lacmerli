@@ -11,11 +11,13 @@ public class CameraBehavior : MonoBehaviour
     public static Transform target;
     public static float zoomSize;
 
-    private static bool canMove;
-    private static CinemachineBrain cmBrain;
+    public static bool canMove;
+    public static CinemachineBrain cmBrain;
 
     private float zoom;
     private float zoomVelocity;
+
+    private Vector3 followVelocity;
 
     private void Awake()
     {
@@ -28,7 +30,7 @@ public class CameraBehavior : MonoBehaviour
     private void LateUpdate()
     {
         if (target == null || !canMove) return;
-        canMove = cmBrain == null;
+        if (cmBrain != null) canMove = !cmBrain.enabled;
 
         FollowPlayer();
         Zoom();
@@ -46,7 +48,7 @@ public class CameraBehavior : MonoBehaviour
         if (target.position == transform.position) return;
         Vector3 targetPosition = target.position;
         targetPosition.z = transform.position.z;
-        transform.position = Vector3.Lerp(transform.position, targetPosition, followSpeed * Time.deltaTime);
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref followVelocity, 0.01f, followSpeed);
     }
 
     public static IEnumerator CameraShake(float shakeDuration, float shakeIntensity)
@@ -57,8 +59,8 @@ public class CameraBehavior : MonoBehaviour
         float timeElapsed = 0;
         while (timeElapsed < shakeDuration)
         {
-            float x = Random.Range(-shakeIntensity, shakeIntensity) + originalPosition.x;
-            float y = Random.Range(-shakeIntensity, shakeIntensity) + originalPosition.y;
+            float x = Random.Range(-1, 1) * shakeIntensity + originalPosition.x;
+            float y = Random.Range(-1, 1) * shakeIntensity + originalPosition.y;
             float z = originalPosition.z;
 
             Vector3 newPosition = new Vector3(x, y, z);
@@ -67,7 +69,7 @@ public class CameraBehavior : MonoBehaviour
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        Camera.main.transform.position = target != null ? target.position : originalPosition;
+        Camera.main.transform.position = originalPosition;
         canMove = true;
         if (cmBrain != null) cmBrain.enabled = true;
         yield return null;

@@ -118,6 +118,8 @@ public class TutorialPlayer : MonoBehaviour
 
     #endregion
 
+    #region Unity Methods
+
     private void Awake()
     {
         // initialize variables on awake
@@ -149,6 +151,8 @@ public class TutorialPlayer : MonoBehaviour
     {
         Walk();
     }
+
+    #endregion
 
     #region Private Methods
 
@@ -193,6 +197,7 @@ public class TutorialPlayer : MonoBehaviour
 
         yield return new WaitForSeconds(slashCooldown);
         canSlash = true;
+        canDash = true;
         yield return null;
     }
 

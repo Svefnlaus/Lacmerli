@@ -123,6 +123,37 @@ MonoBehaviour:
   spawnCount: 5
   spawnObject:
   - {fileID: 1896694009227159541, guid: da3a00c11737e9847a7bf27d6d296ef6, type: 3}
+--- !u!1 &449392015918690080
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1239019241404674474}
+  m_Layer: 0
+  m_Name: Dump
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1239019241404674474
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449392015918690080}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6479026164538746919}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &522316995941202464
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,6 +318,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8031902559896264775}
+  - {fileID: 1239019241404674474}
   - {fileID: 707100439639188592}
   - {fileID: 438133593547802448}
   - {fileID: 1132842651481681865}
@@ -310,7 +342,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &595951483908152708
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1282,7 +1314,7 @@ MonoBehaviour:
   - {x: -0.06758976, y: 0.4253261, z: 0}
   m_ShapePathHash: -1493700041
   m_Mesh: {fileID: 0}
-  m_InstanceId: 236624
+  m_InstanceId: 153544
   m_LocalBounds:
     m_Center: {x: 0.0021431446, y: 0.56352514, z: 0}
     m_Extent: {x: 0.37702584, y: 0.47775966, z: 0}
@@ -1761,10 +1793,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e46f79514790d0645ba58a26e784d270, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dump: {fileID: 1239019241404674474}
   loader: {fileID: 7671226518950732742, guid: cebff35c5ea63a04caa7ed6086699379, type: 3}
   gameOverScreen: {fileID: 7489683840374440426}
-  coinDisplay: {fileID: 4435903289050296574}
   objectivesBoard: {fileID: 7714580384981321625}
+  coinDisplay: {fileID: 4435903289050296574}
   enemiesAlwaysMoving: 0
   swing: {fileID: 7118610302059038630}
   whoosh: {fileID: 394770525016847693}
@@ -1775,15 +1808,15 @@ MonoBehaviour:
   auraCaster: {fileID: 5257769922577790624}
   energyBar: {fileID: 6127137004613534542}
   attackDamage: 15
-  attackCharge: 0.25
+  attackCharge: 0.15
   attackCooldown: 0.25
   attackDuration: 0.15
   damageScreen: {fileID: 2038359393124218612}
   health: {fileID: 8852495929892261007}
   maxHealth: 80
   deathDelay: 1.35
-  damageShakeDuration: 0.25
-  damageShakeIntensity: 0.15
+  damageShakeDuration: 0.15
+  damageShakeIntensity: 0.025
   dashBar: {fileID: 2722828813568016353}
   time: 0.1
   speed: 9
@@ -1909,7 +1942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f28c0880d75588b49a5bec50d42d5ab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 7.5
+  damage: 25
 --- !u!1 &5342186514998481997
 GameObject:
   m_ObjectHideFlags: 0
@@ -2721,7 +2754,7 @@ MonoBehaviour:
     serializedVersion: 2
     key0: {r: 0.5754717, g: 0.018458487, b: 0.018458487, a: 1}
     key1: {r: 0.8666667, g: 0.38147283, b: 0, a: 1}
-    key2: {r: 0.8679245, g: 0.8205168, b: 0, a: 0.92156863}
+    key2: {r: 0.8679245, g: 0.8205168, b: 0, a: 0}
     key3: {r: 0.41892162, g: 0.7924528, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
@@ -2736,8 +2769,8 @@ MonoBehaviour:
     ctime6: 0
     ctime7: 0
     atime0: 0
-    atime1: 22937
-    atime2: 65535
+    atime1: 65535
+    atime2: 0
     atime3: 0
     atime4: 0
     atime5: 0
@@ -2746,9 +2779,9 @@ MonoBehaviour:
     m_Mode: 1
     m_ColorSpace: -1
     m_NumColorKeys: 4
-    m_NumAlphaKeys: 3
+    m_NumAlphaKeys: 2
   bar: {fileID: 8148425273946819903}
-  updateSpeed: 60
+  percentage: {fileID: 0}
 --- !u!1 &7407040400114755573
 GameObject:
   m_ObjectHideFlags: 0
@@ -3735,7 +3768,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 9175921875663688792}
         m_TargetAssemblyTypeName: ButtonManager, Assembly-CSharp
-        m_MethodName: Retry
+        m_MethodName: ResetScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

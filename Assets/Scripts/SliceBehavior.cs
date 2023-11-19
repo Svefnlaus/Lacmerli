@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SliceBehavior : StateMachineBehaviour
@@ -20,5 +22,12 @@ public class SliceBehavior : StateMachineBehaviour
         TutorialPlayer.accessToMove = false;
         if (Player.swordRange != null) Player.swordRange.gameObject.SetActive(false);
         if (TutorialPlayer.swordRange != null) TutorialPlayer.swordRange.gameObject.SetActive(false);
+    }
+
+    private IEnumerator showSword()
+    {
+        if (Player.swordRange != null) Player.swordRange.gameObject.SetActive(true);
+        if (TutorialPlayer.swordRange != null) TutorialPlayer.swordRange.gameObject.SetActive(true);
+        yield return null;
     }
 }

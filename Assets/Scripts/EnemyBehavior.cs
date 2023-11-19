@@ -139,9 +139,6 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (willError) return;
         Attack();
-
-        // was put here to prevent dying in pratice mode
-        Death();
     }
 
     private void LateUpdate()
@@ -153,11 +150,13 @@ public class EnemyBehavior : MonoBehaviour
     public void TakeDamage(float damage)
     {
         health.gameObject.SetActive(true);
-        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
         health.UpdateCurrentHealth(currentHealth);
 
         // show health bar when damaged
         StartCoroutine(showHealthBar());
+
+        Death();
     }
 
     #region Private Methods
@@ -175,8 +174,9 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Death()
     {
-        if (currentHealth > 0.1f) return;
+        if (health.percentage.value >= 0.1 || isDead) return;
         isDead = true;
+        health.gameObject.SetActive(false);
         animator.SetTrigger("Death");
         Objectives.enemiesSlain++;
     }
